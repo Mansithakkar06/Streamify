@@ -256,7 +256,7 @@ const updaeUserAvatar = asyncHandler(async (req, res) => {
         .json(new ApiResponse(200, user, "Avatar updated successfully"))
 })
 
-const updaeCoverImage = asyncHandler(async (req, res) => {
+const updateCoverImage = asyncHandler(async (req, res) => {
     const coverImageLocalPath = req.file?.path
     if (!coverImageLocalPath) {
         throw new ApiError(400, "Cover Image is missing!!")
@@ -414,7 +414,7 @@ export {
     changeCurrentPassword,
     getCurrentUser,
     updateAccountDetails,
-    updaeCoverImage,
+    updateCoverImage,
     updaeUserAvatar,
     getUserChannelProfile,
     getWatchHistory
