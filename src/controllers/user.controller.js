@@ -1,7 +1,7 @@
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
 import { User } from "../models/user.model.js"
-import { uploadOnCloudinary } from '../utils/cloudinary.js'
+import { deleteFromCloudinary, uploadOnCloudinary } from '../utils/cloudinary.js'
 import { ApiResponse } from '../utils/ApiResponse.js'
 import jwt from "jsonwebtoken"
 import mongoose from "mongoose";
@@ -65,8 +65,14 @@ const registerUser = asyncHandler(async (req, res) => {
         fullName,
         email,
         password,
-        avatar: avatar.url,
-        coverImage: coverImage?.url || ""
+        avatar: {
+            url: avatar?.url,
+            public_id: avatar?.public_id
+        },
+        coverImage: {
+            url: coverImage?.url ?? "",
+            public_id: coverImage?.public_id ?? "",
+        }
     })
     //remove password and refreshtoken
     const createdUser = await User.findById(user._id).select("-password -refreshToken")
@@ -182,7 +188,8 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
 
 const changeCurrentPassword = asyncHandler(async (req, res) => {
     const { oldPassword, newPassword } = req.body;
-    const user = User.findById(req.user?._id)
+    // console.log(req.user)
+    const user = await User.findById(req.user?._id)
     const isPasswordCorrect = user.isPasswordCorrect(oldPassword);
     if (!isPasswordCorrect) {
         throw new ApiError(400, "Invalid old Password")
@@ -202,7 +209,7 @@ const getCurrentUser = asyncHandler(async (req, res) => {
         .json(
             new ApiResponse(
                 200,
-                res.user,
+                req.user,
                 "current user get successfull"
             ),
         );
@@ -217,8 +224,8 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
     const user = await User.findByIdAndUpdate(req.user?._id,
         {
             $set: {
-                email,
-                fullName
+                email: email ?? req.user.email,
+                fullName: fullName ?? req.user.fullName
             }
         },
         {
@@ -233,7 +240,7 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
         )
 })
 
-const updaeUserAvatar = asyncHandler(async (req, res) => {
+const updateUserAvatar = asyncHandler(async (req, res) => {
     const avatarLocalPath = req.file?.path
     if (!avatarLocalPath) {
         throw new ApiError(400, "Avatar is missing!!")
@@ -245,15 +252,24 @@ const updaeUserAvatar = asyncHandler(async (req, res) => {
     const user = await User.findByIdAndUpdate(req.user?._id,
         {
             $set: {
-                avatar: avatar.url
+                avatar: {
+                    url: avatar.url,
+                    public_id: avatar.public_id
+                }
             }
         },
         { new: true }
     ).select("-password");
-    //delete old image 
+    //delete old avatar from cloudinary
+    const publicId = req.user.avatar.public_id
+    const deleteAvatar = await deleteFromCloudinary(publicId)
+
     return res
         .status(200)
-        .json(new ApiResponse(200, user, "Avatar updated successfully"))
+        .json(new ApiResponse(200, {
+            user,
+            deleteAvatar
+        }, "Avatar updated successfully"))
 })
 
 const updateCoverImage = asyncHandler(async (req, res) => {
@@ -268,15 +284,27 @@ const updateCoverImage = asyncHandler(async (req, res) => {
     const user = await User.findByIdAndUpdate(req.user?._id,
         {
             $set: {
-                coverImage: coverImage.url
+                coverImage: {
+                    url: coverImage.url,
+                    public_id: coverImage.public_id
+                }
             }
         },
         { new: true }
     ).select("-password");
+    //delete old coverImage from cloudinary
+    let deleteCoverImage;
+    if (req.user.coverImage.url && req.user.coverImage.public_id) {
+        const publicId = req.user.coverImage.public_id
+        deleteCoverImage = await deleteFromCloudinary(publicId)
+    }
 
     return res
         .status(200)
-        .json(new ApiResponse(200, user, "cover image updated successfully"))
+        .json(new ApiResponse(200, {
+            user,
+            deleteCoverImage
+        }, "cover image updated successfully"))
 })
 
 const getUserChannelProfile = asyncHandler(async (req, res) => {
@@ -320,8 +348,8 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
                 },
                 isSubscribed: {
                     $cond: {
-                        $if: { $in: [req.user?._id, "$subscribers.subscriber"] },
-                        then: true,
+                        if: { $in: [req.user?._id, "$subscribers.subscriber"] },
+                        then: true, 
                         else: false
                     }
                 }
@@ -341,7 +369,6 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
             }
         }
     ])
-    console.log(channel)
     if (!channel?.length) {
         throw new ApiError("404", "channel not found!!")
     }
@@ -353,34 +380,34 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
         )
 })
 
-const getWatchHistory=asyncHandler(async(req,res)=>{
+const getWatchHistory = asyncHandler(async (req, res) => {
     const user = await User.aggregate([
         {
-            $match:{
-                _id:new mongoose.Types.ObjectId(req.user._id)
+            $match: {
+                _id: new mongoose.Types.ObjectId(req.user._id)
             }
         },
         {
-            $lookup:{
-                from:"videos",
-                localField:"watchHistory",
-                foreignField:"_id",
-                as:"watchHistory",
+            $lookup: {
+                from: "videos",
+                localField: "watchHistory",
+                foreignField: "_id",
+                as: "watchHistory",
                 //to select userdata from user table 
-                pipeline:[
+                pipeline: [
                     {
-                        $lookup:{
-                            from:"users",
-                            localField:"owner",
-                            foreignField:"_id",
-                            as:"owner",
+                        $lookup: {
+                            from: "users",
+                            localField: "owner",
+                            foreignField: "_id",
+                            as: "owner",
                             //to get only needed info about user
-                            pipeline:[
+                            pipeline: [
                                 {
-                                    $project:{
-                                        fullName:1,
-                                        username:1,
-                                        avatar:1,
+                                    $project: {
+                                        fullName: 1,
+                                        username: 1,
+                                        avatar: 1,
                                     }
                                 }
                             ]
@@ -388,9 +415,9 @@ const getWatchHistory=asyncHandler(async(req,res)=>{
                     },
                     {
                         //so that dont have to access element like owner[0].username etc..
-                        $addFields:{
-                            owner:{
-                                $first:"$owner"
+                        $addFields: {
+                            owner: {
+                                $first: "$owner"
                             }
                         }
                     }
@@ -400,10 +427,10 @@ const getWatchHistory=asyncHandler(async(req,res)=>{
     ])
 
     return res
-    .status(200)
-    .json(
-        new ApiResponse(200,user[0].watchHistory,"watch history fetched successfully")
-    )
+        .status(200)
+        .json(
+            new ApiResponse(200, user[0].watchHistory, "watch history fetched successfully")
+        )
 })
 
 export {
@@ -415,7 +442,7 @@ export {
     getCurrentUser,
     updateAccountDetails,
     updateCoverImage,
-    updaeUserAvatar,
+    updateUserAvatar,
     getUserChannelProfile,
     getWatchHistory
 }
