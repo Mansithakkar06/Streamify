@@ -28,7 +28,7 @@ const generateTokens = async (userId) => {
 }
 
 const registerUser = asyncHandler(async (req, res) => {
-    //get data from frontend
+    //get text data from frontend
     const { username, fullName, email, password } = req.body;
     //check for empty values
     if ([username, fullName, email, password].some((field) => field?.trim() === "")) {
@@ -43,7 +43,7 @@ const registerUser = asyncHandler(async (req, res) => {
     }
     //store images localpath
     const avatarLocalPath = req.files?.avatar[0]?.path;
-    // const coverImageLocalPath=req.files?.coverImage[0]?.path;
+    // const coverImageLocalPath=req?.files?.coverImage?.[0]?.path;
     let coverImageLocalPath;
     if (req.files && Array.isArray(req.files.coverImage) && req.files.coverImage.length > 0) {
         coverImageLocalPath = req.files.coverImage[0].path

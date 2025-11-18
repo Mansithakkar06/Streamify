@@ -1,3 +1,4 @@
+//so that dont have to write try catch in every async function
 const asyncHandler=(fn)=>{
    return (req,res,next)=>{
         Promise

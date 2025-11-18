@@ -60,17 +60,20 @@ const userSchema = new Schema(
     { timestamps: true }
 )
 
+//this pre hook will check the password whenever some data is saved in users collection
 userSchema.pre("save", async function (next) {
     if (!this.isModified("password")) return next();
     this.password = await bcrypt.hash(this.password, 10)
     next()
 })
 
+//this method will compare the password given by user and in collection
 userSchema.methods.isPasswordCorrect = async function (password) {
     password=String(password)
     return await bcrypt.compare(password, this.password)
 }
 
+//to generate access token 
 userSchema.methods.generateAccessToken = function () {
    return jwt.sign(
         {
@@ -85,6 +88,8 @@ userSchema.methods.generateAccessToken = function () {
         }
     )
 }
+
+//to generate refresh token
 userSchema.methods.generateRefreshToken = function () {
      return jwt.sign(
         {
@@ -96,4 +101,5 @@ userSchema.methods.generateRefreshToken = function () {
         }
     )
 }
+
 export const User = model("User", userSchema)

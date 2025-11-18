@@ -2,9 +2,11 @@ import dotenv from 'dotenv'
 import dbconnection from './db/connection.js';
 import { app } from './app.js';
 
-dotenv.config({
-    path:"./.env"
-})
+//if .env file is not in root directory then provide the path
+// dotenv.config({
+//     path:"./.env"
+// })
+dotenv.config()
 dbconnection()
 .then(()=>{
     app.listen(process.env.PORT || 8000,()=>{
