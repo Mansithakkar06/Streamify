@@ -16,7 +16,9 @@ app.use(cookieParser()) //to allow express to access cookies
 
 //routes
 import userRouter from './routes/user.routes.js'
+import videoRouter from "./routes/video.routes.js"
 
 app.use("/api/v1/users",userRouter) //so that we dont have to write full path all the times
+app.use("/api/v1/videos",videoRouter)
 
 export {app}
