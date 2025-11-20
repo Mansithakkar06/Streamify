@@ -13,10 +13,12 @@ const likeSchema = new Schema(
         likedBy:
         {
             type: Schema.Types.ObjectId,
-            ref: "User"
+            ref: "User",
+            required:true,
         },
-        status:{
-            type:Boolean,
+        reaction:{
+            type:String,
+            enum:["like","dislike"]
         }
     }, { timestamps: true })
 

@@ -6,6 +6,7 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import mongoose from "mongoose";
 
 const getAllVideos = asyncHandler(async (req, res) => {
+    //TODO: get videos by filter,pagination,user,sorting etc..
     const videos = await Video.find({})
     if (!videos.length) {
         throw new ApiError(200, "No video found!!")
@@ -56,7 +57,7 @@ const publishVideo = asyncHandler(async (req, res) => {
             public_id: videoFile.public_id
         },
         duration: videoFile.duration,
-        owner: new mongoose.Types.ObjectId(req.user._id)
+        owner: new mongoose.Types.ObjectId(req.user?._id)
     })
     if (!video) {
         throw new ApiError(500, "error in creating video!!")
