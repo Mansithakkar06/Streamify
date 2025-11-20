@@ -1,7 +1,7 @@
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
 import { User } from "../models/user.model.js"
-import { deleteFromCloudinary, uploadOnCloudinary } from '../utils/cloudinary.js'
+import { deleteImageFromCloudinary, uploadOnCloudinary } from '../utils/cloudinary.js'
 import { ApiResponse } from '../utils/ApiResponse.js'
 import jwt from "jsonwebtoken"
 import mongoose from "mongoose";
@@ -262,7 +262,7 @@ const updateUserAvatar = asyncHandler(async (req, res) => {
     ).select("-password");
     //delete old avatar from cloudinary
     const publicId = req.user.avatar.public_id
-    const deleteAvatar = await deleteFromCloudinary(publicId)
+    const deleteAvatar = await deleteImageFromCloudinary(publicId)
 
     return res
         .status(200)
@@ -296,7 +296,7 @@ const updateCoverImage = asyncHandler(async (req, res) => {
     let deleteCoverImage;
     if (req.user.coverImage.url && req.user.coverImage.public_id) {
         const publicId = req.user.coverImage.public_id
-        deleteCoverImage = await deleteFromCloudinary(publicId)
+        deleteCoverImage = await deleteImageFromCloudinary(publicId)
     }
 
     return res

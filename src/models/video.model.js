@@ -21,7 +21,7 @@ const videoSchema = new Schema(
             public_id: {
                 type: String,
                 required: true
-            }
+            }   
         },
         title: {
             type: String,
