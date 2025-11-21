@@ -76,7 +76,8 @@ const getVideoComments=asyncHandler(async(req,res)=>{
      if(!mongoose.Types.ObjectId.isValid(videoId)){
         throw new ApiError(400,"invalid id!!")
     }
-    const comments=await Comment.find({video:new mongoose.Types.ObjectId(videoId)})
+    //TODO: get owner details and video details also
+    const comments=await Comment.find({video:videoId})
     if(!comments.length){
         throw new ApiError(400,"no comments yet!!")
     }

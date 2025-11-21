@@ -384,7 +384,7 @@ const getWatchHistory = asyncHandler(async (req, res) => {
     const user = await User.aggregate([
         {
             $match: {
-                _id: new mongoose.Types.ObjectId(req.user._id)
+                _id: new mongoose.Types.ObjectId(req.user?._id)
             }
         },
         {
@@ -420,17 +420,82 @@ const getWatchHistory = asyncHandler(async (req, res) => {
                                 $first: "$owner"
                             }
                         }
+                    },
+                    {
+                        $project:{
+                            title:1,
+                            thumbnail:1,
+                            views:1,
+                            duration:1,
+                            owner:1,
+                            createdAt:1
+                        }
                     }
                 ]
             }
         }
     ])
-
+    if(!(user[0].watchHistory).length){
+        throw new ApiError(400,"no history!!")
+    }
     return res
         .status(200)
         .json(
             new ApiResponse(200, user[0].watchHistory, "watch history fetched successfully")
         )
+})
+
+const removeFromWatchHistory=asyncHandler(async(req,res)=>{
+    const {videoId}=req.params;
+     if (!mongoose.Types.ObjectId.isValid(videoId)) {
+        throw new ApiError(400, "invalid id!!")
+    }
+    const oldhistory=await User.findById(req.user?.id)
+    if(!oldhistory.watchHistory.length){
+        throw new ApiError(400,"no history found!!")
+    }
+    if(!(oldhistory.watchHistory).includes(videoId)){
+        throw new ApiError(400,"video does not exists!!")
+    }
+    const history=await User.findByIdAndUpdate(req.user?.id,
+        {
+            $pull:{
+                watchHistory:videoId
+            }
+        },
+        {new:true}
+    )
+    if(!history){
+        throw new ApiError(500,"error in deleting from history!!")
+    }
+    return res
+    .status(200)
+    .json(
+        new ApiResponse(200,"video removed from history!!")
+    )    
+})
+
+const deleteWatchHistory=asyncHandler(async(req,res)=>{
+const oldhistory=await User.findById(req.user?.id)
+    if(!oldhistory.watchHistory.length){
+        throw new ApiError(400,"no history found!!")
+    }
+    const history=await User.findByIdAndUpdate(req.user?.id,
+        {
+            $set:{
+                watchHistory:[]
+            }
+        },
+        {new:true}
+    )
+    if(!history){
+        throw new ApiError(400,"no history find!!")
+    }
+    return res
+    .status(200)
+    .json(
+        new ApiResponse(200,"history deleted successfully!!")
+    )   
 })
 
 export {
@@ -444,5 +509,7 @@ export {
     updateCoverImage,
     updateUserAvatar,
     getUserChannelProfile,
-    getWatchHistory
+    getWatchHistory,
+    removeFromWatchHistory,
+    deleteWatchHistory
 }

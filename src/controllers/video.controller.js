@@ -4,6 +4,7 @@ import { deleteImageFromCloudinary, deleteVideoFromCloudinary, uploadOnCloudinar
 import { Video } from "../models/video.model.js"
 import { ApiResponse } from "../utils/ApiResponse.js";
 import mongoose from "mongoose";
+import { User } from "../models/user.model.js";
 
 const getAllVideos = asyncHandler(async (req, res) => {
     //TODO: get videos by filter,pagination,user,sorting etc..
@@ -76,6 +77,22 @@ const getVideoById = asyncHandler(async (req, res) => {
     //validate id
     if (!mongoose.Types.ObjectId.isValid(id)) {
         throw new ApiError(400, "Invalid id!!")
+    }
+    await Video.findByIdAndUpdate(id,
+        {
+            $inc:{
+                views:1
+            }
+        }
+    )
+    if(req.user){
+        await User.findByIdAndUpdate(req.user?.id,
+            {
+                $addToSet:{
+                    watchHistory:id
+                }
+            }
+        )
     }
     const video = await Video.aggregate([
         {

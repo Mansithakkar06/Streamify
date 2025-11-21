@@ -9,6 +9,4 @@ router.route("/updateComment/:id").patch(verifyJWT,updateComment)
 router.route("/deleteComment/:id").delete(verifyJWT,deleteComment)
 router.route("/getVideoComments/:videoId").get(getVideoComments)
 
-
-
 export default router

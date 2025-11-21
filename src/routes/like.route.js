@@ -4,8 +4,9 @@ import {verifyJWT} from '../middlewares/auth.middleware.js'
 
 const router=Router()
 
-router.route("/toggleVideoLike/:id").post(verifyJWT,toggleVideoLike)
-router.route("/toggleCommentLike/:id").post(verifyJWT,toggleCommentLike)
-router.route("/getLikedVideos").get(verifyJWT,getLikedVideos)
+router.use(verifyJWT)
+router.route("/toggleVideoLike/:id").post(toggleVideoLike)
+router.route("/toggleCommentLike/:id").post(toggleCommentLike)
+router.route("/getLikedVideos").get(getLikedVideos)
 
 export default router
