@@ -58,7 +58,7 @@ const publishVideo = asyncHandler(async (req, res) => {
             public_id: videoFile.public_id
         },
         duration: videoFile.duration,
-        owner: new mongoose.Types.ObjectId(req.user?._id)
+        owner: req.user?._id
     })
     if (!video) {
         throw new ApiError(500, "error in creating video!!")

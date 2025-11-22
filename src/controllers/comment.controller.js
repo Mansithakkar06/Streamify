@@ -16,9 +16,9 @@ const addComment=asyncHandler(async (req,res) => {
     }
     //add comment
     const comment=await Comment.create({
-        video:new mongoose.Types.ObjectId(videoId),
+        video:videoId,
         content:content,
-        owner:new mongoose.Types.ObjectId(req.user?._id)
+        owner:req.user?._id
     })
     if(!comment){
         throw new ApiError(500,"error in creating comment!!")
