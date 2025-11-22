@@ -132,7 +132,7 @@ const getPlayListById = asyncHandler(async (req, res) => {
             }
         }
     ])
-    if (!playlist) {
+    if (!playlist.length) {
         throw new ApiError(400, "playlist not found!!")
     }
     return res

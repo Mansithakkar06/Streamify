@@ -76,8 +76,39 @@ const getVideoComments=asyncHandler(async(req,res)=>{
      if(!mongoose.Types.ObjectId.isValid(videoId)){
         throw new ApiError(400,"invalid id!!")
     }
-    //TODO: get owner details and video details also
-    const comments=await Comment.find({video:videoId})
+    const comments=await Comment.aggregate([
+        {
+            $match:{
+                video:new mongoose.Types.ObjectId(videoId)
+            }
+        },
+        {
+            $lookup:{
+                from:"users",
+                localField:"owner",
+                foreignField:"_id",
+                as:"owner",
+                pipeline:[
+                    {
+                        $project:{
+                            username:1,
+                            avatar:1,
+                            fullName:1
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            $addFields:{
+                owner:{
+                    $first:"$owner"
+                }
+            }
+        }
+    ])
+
+    // const comments=await Comment.find({video:videoId})
     if(!comments.length){
         throw new ApiError(400,"no comments yet!!")
     }

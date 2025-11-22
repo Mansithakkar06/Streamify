@@ -73,7 +73,7 @@ const getChannelSubscribers = asyncHandler(async (req, res) => {
             }
         }
     ])
-    if(!subscribers){
+    if(!subscribers.length){
         throw new ApiError(500,"error fetching subscribers!!")
     }
     return res.status(200).json(new ApiResponse(200,subscribers,"subscribers fetched successfully"))
@@ -119,7 +119,7 @@ const getChannelsSubscribedTo=asyncHandler(async(req,res)=>{
             }
         }
     ])
-    if(!channels){
+    if(!channels.length){
         throw new ApiError(500,"error fetching subscribed channels!!")
     }
     return res.status(200).json(new ApiResponse(200,channels,"channels fetched successfully"))
