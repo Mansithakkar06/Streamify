@@ -7,9 +7,30 @@ import mongoose from "mongoose";
 import { User } from "../models/user.model.js";
 
 const getAllVideos = asyncHandler(async (req, res) => {
-    //TODO: get videos by filter,pagination,user,sorting etc..
-    const { page = 1, limit = 10, query, sortBy, sortType, userId } =req.query
-    const videos = await Video.find({})
+    //get videos by filter,pagination,user,sorting etc..
+    const { page = 1, limit = 10, query, sortBy, sortType, userId } =req.query;
+    let filter={isPublished:true};
+    //pagination
+    let skip=(page-1)*limit //ex:3-1=2 * 10 =20 skip 20 videos, show 21-30 videos on 3rd page
+    //sorting
+    let sort={}
+    sort[sortBy]=sortType==="asc"?"asc":"desc"; //ex:{"title":"asc"}
+    if(userId){
+        if(!mongoose.Types.ObjectId.isValid(userId)){
+            throw new ApiError(400,"invalid id!!")
+        }
+        filter.owner=userId;
+    }
+    //searching
+    if(query){
+        filter.title={$regex:query,$options:"i"}
+    }
+    const videos = await Video.find(filter)
+    .sort(sort)
+    .skip(skip)
+    .limit(parseInt(limit))
+    .populate("owner","fullName avatar username");
+
     if (!videos.length) {
         throw new ApiError(200, "No video found!!")
     }
