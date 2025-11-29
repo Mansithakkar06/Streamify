@@ -11,7 +11,7 @@ function Layout() {
                 <div>
                     <Sidebar />
                 </div>
-                <div className='p-4'>
+                <div className='p-4 w-full'>
                     <Outlet />
                 </div>
 
