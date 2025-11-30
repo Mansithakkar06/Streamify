@@ -168,15 +168,18 @@ const updateVideoDetails = asyncHandler(async (req, res) => {
     }
 
     let { title, description } = req.body;
-    
     const oldvideo = await Video.findById(id)
     if (!oldvideo) {
         throw new ApiError(404, "video not found")
     }
-    if (!(title && description)) {
+    if(!title){
         title=oldvideo.title
+    }
+    if(!description)
+    {
         description=oldvideo.description
     }
+    
 
     const thumbnailLocalPath = req.file?.path;
     let url, public_id, deleteThumbnail;
