@@ -6,6 +6,8 @@ import {BrowserRouter,Route, Routes} from 'react-router-dom'
 import Navbar from './components/Navbar'
 import Layout from './Layout'
 import Home from './pages/Home'
+import VideoListPage from './pages/VideoListPage'
+import VideoDetailPage from './pages/VideoDetailPage'
 
 function App() {
 
@@ -14,7 +16,10 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path='/' Component={Layout}>
-            <Route path='/' Component={Home}/>
+            <Route path='/' Component={Home} />
+            <Route path='/search' Component={VideoListPage} />
+            <Route path='/videoDetail/:id' Component={VideoDetailPage} />
+
           </Route>
         </Routes>
       </BrowserRouter>

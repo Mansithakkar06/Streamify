@@ -27,6 +27,7 @@ export const optionalJWT=asyncHandler(async(req,_,next)=>{
         if(!token){
             req.user=null;
             next()
+            return
         }
         const decodeToken=jwt.verify(token,process.env.ACCESS_TOKEN_SECRET)
         const user=await User.findById(decodeToken?._id).select("-password -refreshToken")

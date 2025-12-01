@@ -5,8 +5,7 @@ import { api } from '../api/api';
 import VideoCardView from '../components/VideoCardView';
 
 function Home() {
-  const [videos,setVideos]=useState("")
-  console.log(videos)
+  const [videos,setVideos]=useState([])
 
   useEffect(() => {
     const getVideos=async()=>{
@@ -27,7 +26,7 @@ function Home() {
     </div>
   )
   :(
-    <div className='flex flex-row p-1 m-1'>
+    <div className='grid grid-cols-4 gap-x-5 gap-y-1'>
       {videos.map((video)=>(
         <div key={video._id} className='mx-2'>
           <VideoCardView video={video}/>
