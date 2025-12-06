@@ -10,7 +10,7 @@ function VideoCardView({ video }) {
       <div className='relative'>
         <img src={video.thumbnail.url} alt="thumbnail" className="h-48 w-full object-cover shadow-md" />
         <div className="absolute bottom-0 right-0 m-1">
-          <p className='bg-black px-2 text-white rounded-lg'>{formatDuration(video.duration)}</p>
+          <p className='bg-black px-2 text-white rounded-md'>{formatDuration(video.duration)}</p>
         </div>
       </div>
       <div className='py-2 my-1 flex'>

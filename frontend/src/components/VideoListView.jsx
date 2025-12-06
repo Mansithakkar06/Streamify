@@ -9,7 +9,7 @@ function VideoListView({video}) {
         <div className='relative'>
         <img src={video.thumbnail.url} alt="thumbnail" className="h-48 w-full object-cover shadow-md" /> 
         <div className='absolute bottom-0 right-0'>
-            <p className='bg-black px-2 m-1 rounded-lg'>{formatDuration(video.duration)}</p>
+            <p className='bg-black px-2 m-1 rounded-md'>{formatDuration(video.duration)}</p>
         </div>
 
         </div>
