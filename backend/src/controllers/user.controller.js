@@ -8,7 +8,7 @@ import mongoose from "mongoose";
 
 const options = {
     httpOnly: true,
-    secure: true
+    secure: false
 }
 
 const generateTokens = async (userId) => {
@@ -87,10 +87,14 @@ const registerUser = asyncHandler(async (req, res) => {
 
 const loginUser = asyncHandler(async (req, res) => {
     //get data from frontend
-    const { username, email, password } = req.body;
+    const { username, password } = req.body;
     //validate null data
-    if (!(username || email)) {
+    if (!username) {
         throw new ApiError(400, "username or email is required!!")
+    }
+    let email;
+    if(username.includes("@")){
+        email=username
     }
     //find if user exists or not
     const user = await User.findOne({
@@ -100,7 +104,7 @@ const loginUser = asyncHandler(async (req, res) => {
         ]
     });
     if (!user) {
-        throw new ApiError(404, "user does not exists!!")
+        throw new ApiError(400, "user does not exists!!")
     }
     //validate password
     const passwordValidation = await user.isPasswordCorrect(password)

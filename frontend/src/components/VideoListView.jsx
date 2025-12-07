@@ -1,9 +1,11 @@
 import React from 'react'
 import { formatTime } from '../utils/formatTime'
 import { formatDuration } from '../utils/formatDuration'
+import { Link } from 'react-router-dom'
 
 function VideoListView({video}) {
   return (
+    <Link to={`/videoDetail/${video._id}`}>
     <div className='flex mb-4'>
       <div className='w-100'>
         <div className='relative'>
@@ -26,6 +28,7 @@ function VideoListView({video}) {
         <p className='text-xs'>{(video.description).length>170? (video.description).slice(0,170)+"....." :video.description}</p>
       </div>
     </div>
+    </Link>
   )
 }
 

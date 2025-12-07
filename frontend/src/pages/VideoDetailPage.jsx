@@ -3,12 +3,31 @@ import { useParams } from 'react-router-dom'
 import { api } from '../api/api';
 import VideoSuggestionView from '../components/VideoSuggestionView';
 import { formatTime } from '../utils/formatTime';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faThumbsDown, faThumbsUp } from '@fortawesome/free-regular-svg-icons';
+import { faFolderPlus, faUserPlus } from '@fortawesome/free-solid-svg-icons';
+import CommentView from '../components/CommentView';
 
 function VideoDetailPage() {
     const { id } = useParams()
     const [video, setVideo] = useState({})
-    const [url,setUrl]=useState("")
-    const [suggestions,setSuggestions]=useState([])
+    const [url, setUrl] = useState("")
+    const [suggestions, setSuggestions] = useState([])
+    const [likes, setLikes] = useState(0)
+    const [disLikes, setDislikes] = useState(0)
+    const [comments, setComments] = useState([])
+    const [content, setContent] = useState("")
+
+    const commentHandler = async (e) => {
+        e.preventDefault()
+        try {
+            const res = await api.post(`/comments/addComment/${id}`, content)
+            console.log(res)
+        } catch (error) {
+            console.log("error in adding comment", error)
+        }
+
+    }
 
     useEffect(() => {
         const fetchVideo = async () => {
@@ -21,18 +40,45 @@ function VideoDetailPage() {
             }
         }
         fetchVideo()
-    }, []);
-    useEffect(() => {
-        const suggestionVideos=async()=>{
+        const fetchVideoLikes = async () => {
             try {
-                const videos=await api.get("/videos/getAllVideos")
-                const allvideos=videos.data.data
-                const otherVideos=allvideos.filter((v)=>(
-                    v._id!==video._id
+                const res = await api.get(`/likes/getVideoLikes/${id}`)
+                setLikes(res.data.data)
+            } catch (error) {
+                console.log("error in fetching likes", error)
+            }
+        }
+        fetchVideoLikes()
+        const fetchVideoDislikes = async () => {
+            try {
+                const res = await api.get(`/likes/getVideoDislikes/${id}`)
+                setDislikes(res.data.data)
+            } catch (error) {
+                console.log("error in fetching likes", error)
+            }
+        }
+        fetchVideoDislikes()
+        const fetchComments = async () => {
+            try {
+                const comments = await api.get(`/comments/getVideoComments/${id}`)
+                setComments(comments.data.data)
+            } catch (error) {
+                console.log("error in fetching comments", error)
+            }
+        }
+        fetchComments()
+    }, [id]);
+    useEffect(() => {
+        const suggestionVideos = async () => {
+            try {
+                const videos = await api.get("/videos/getAllVideos")
+                const allvideos = videos.data.data
+                const otherVideos = allvideos.filter((v) => (
+                    v._id !== video._id
                 ))
                 setSuggestions(otherVideos)
             } catch (error) {
-                console.log("error in fetching suggestion videos!!",error)
+                console.log("error in fetching suggestion videos!!", error)
             }
         }
         suggestionVideos()
@@ -41,7 +87,7 @@ function VideoDetailPage() {
         console.log(video)
         console.log(url)
     }, []);
-   
+
     return (
         <div className='flex gap-3'>
             <div className=''>
@@ -60,16 +106,58 @@ function VideoDetailPage() {
                     }}
                 />
                 <div className='border rounded-md my-4 p-3'>
-                    <h2 className='text-lg'>{video.title}</h2>
-                {/* <h2 className='text-lg'>{(video.title).replace(/^./, char => char.toUpperCase())}</h2> */}
-                 <span>{video.views} Views . </span><span>{formatTime(video.createdAt)}</span>
+                    <div className='flex justify-between'>
+                        <div>
+                            <h2 className='text-lg'>{(video.title)?.replace(/^./, char => char.toUpperCase())}</h2>
+                            <span>{video.views} Views . </span><span>{formatTime(video.createdAt)}</span>
+                        </div>
+                        <div className='p-3'>
+                            <button className='py-2 px-4 border rounded-l-md hover:cursor-pointer'><FontAwesomeIcon icon={faThumbsUp} /><span>{likes}</span></button>
+                            <button className='py-2 px-4 border rounded-r-md hover:cursor-pointer'><FontAwesomeIcon icon={faThumbsDown} /><span>{disLikes}</span></button>
+                            <button className='ms-5 border p-2 rounded-md hover:cursor-pointer'><FontAwesomeIcon icon={faFolderPlus} /><span className='px-1'>Save</span></button>
+                        </div>
+                    </div>
+                    <div className='flex justify-between'>
+                        <div className='flex'>
+                            <img src={video?.owner?.avatar?.url} alt="avatar" className='rounded-full h-12 w-12 object-cover shadow-md mt-1' />
+                            <div className='p-1 mx-2'>
+                                <p className='text-lg'>{(video?.owner?.username)?.replace(/^./, char => char.toUpperCase())}</p>
+                                <p className='text-sm text-slate-400'>0 Subscribers</p>
+                            </div>
+                        </div>
+                        <div className='p-4'>
+                            <button className='border p-2 rounded-md hover:cursor-pointer'><FontAwesomeIcon icon={faUserPlus} className='mx-1' /> Subscribe</button>
+                        </div>
+                    </div>
+                    <hr />
+                    <div className='p-1'>
+                        <p className='text-sm py-2'>
+                            {video.description}
+                        </p>
+                    </div>
+                </div>
+                <div className='border rounded-md p-3 my-4 w-full'>
+                    <p>{comments.length} {comments.length === 1 ? "Comment" : "Comments"}</p>
+                    <form onSubmit={commentHandler} className='mb-2'>
+                        <input type="text" placeholder='Add a Comment' className='border rounded-md px-2 py-1 my-2 w-full text-white' value={content} onChange={(e) => setContent(e.target.value)} />
+                        <button type='submit'></button>
+                    </form>
+                    <hr />
+                    {
+                        comments.map((comment) => (
+                            <div key={comment._id} className='my-1'>
+                                <CommentView comment={comment} />
+                                <hr />
+                            </div>
+                        ))
+                    }
                 </div>
             </div>
             <div>
                 {
-                    suggestions.map((suggestion)=>(
+                    suggestions.map((suggestion) => (
                         <div key={suggestion._id}>
-                            <VideoSuggestionView video={suggestion}/>
+                            <VideoSuggestionView video={suggestion} />
                         </div>
                     ))
                 }

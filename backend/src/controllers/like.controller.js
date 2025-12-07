@@ -84,7 +84,7 @@ const toggleCommentLike = asyncHandler(async (req, res) => {
 
 const getLikedVideos = asyncHandler(async (req, res) => {
     //get video details
-    const videos = await Like.find({ likedBy: req.user?._id }, { reaction: "like" })
+    const videos = await Like.find({ likedBy: req.user?._id ,reaction: "like" })
     if (!videos.length) {
         return res.status(200).json(new ApiResponse(200, "No liked videos yet!!"))
     }
@@ -93,8 +93,24 @@ const getLikedVideos = asyncHandler(async (req, res) => {
     )
 })
 
+
+
+const getVideoLikes=asyncHandler(async(req,res)=>{
+    const {videoId}=req.params;
+    const likes=await Like.find({video:videoId,reaction:"like"})
+    return res.status(200).json(new ApiResponse(200,likes.length,"video likes fetched successfully"))
+})
+
+const getVideoDislikes=asyncHandler(async(req,res)=>{
+    const {videoId}=req.params;
+    const likes=await Like.find({video:videoId,reaction:"dislike"})
+    return res.status(200).json(new ApiResponse(200,likes.length,"video dislikes fetched successfully"))
+})
+
 export {
     toggleVideoLike,
     toggleCommentLike,
-    getLikedVideos
+    getLikedVideos,
+    getVideoLikes,
+    getVideoDislikes,
 }

@@ -6,7 +6,8 @@ const app=express()
 
 app.use(cors({
     origin:process.env.CORS_ORIGIN,//allows requests from this origin
-    credentials:true //allow cookies and jwt token to be sent
+    credentials:true, //allow cookies and jwt token to be sent
+    methods: "GET,POST,PUT,PATCH,DELETE",
 }))
 
 app.use(express.json({limit:"20kb"})) //to parse json body with size limit

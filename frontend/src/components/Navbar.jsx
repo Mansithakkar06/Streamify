@@ -2,7 +2,7 @@ import { faSearch } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import React, { useState } from 'react'
 import logo from '../assets/images/logo.jpg'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 
 function Navbar() {
     const [search,setSearch]=useState("")
@@ -15,7 +15,7 @@ function Navbar() {
   return (
     <div className='p-2 border-b border-b-white position-sticky top-0 flex justify-between'>
         <div>
-            <img src={logo} alt="" height={50} width={170} />
+            <img src={logo} alt="logo" height={50} width={170} />
         </div>
         <div className='p-2'>
             <form onSubmit={handleSearch} className='border'>
@@ -24,8 +24,8 @@ function Navbar() {
             </form>
         </div>
         <div className='flex justify-between p-2'>
-            <button className='mx-3 p-2 hover:cursor-pointer hover:text-gray-400 hover:bg-gray-600'>Login</button>
-            <button className='mx-3 p-2 hover:cursor-pointer hover:text-gray-400 hover:bg-gray-600'>Signup</button>
+            <Link to="/login" className='mx-3 p-2 hover:cursor-pointer hover:text-gray-400 hover:bg-gray-600'>Login</Link>
+            <Link to='/signup' className='mx-3 p-2 hover:cursor-pointer hover:text-gray-400 hover:bg-gray-600'>Signup</Link>
         </div>
     </div>
   )

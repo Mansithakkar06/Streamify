@@ -110,7 +110,7 @@ const getVideoComments=asyncHandler(async(req,res)=>{
 
     // const comments=await Comment.find({video:videoId})
     if(!comments.length){
-        throw new ApiError(400,"no comments yet!!")
+        new ApiResponse(200,"no comments yet!!")
     }
     return res
     .status(200)

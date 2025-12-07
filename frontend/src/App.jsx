@@ -8,6 +8,8 @@ import Layout from './Layout'
 import Home from './pages/Home'
 import VideoListPage from './pages/VideoListPage'
 import VideoDetailPage from './pages/VideoDetailPage'
+import Login from './pages/Login'
+import Register from './pages/Register'
 
 function App() {
 
@@ -15,11 +17,12 @@ function App() {
     <>
       <BrowserRouter>
         <Routes>
+          <Route path='/login' Component={Login}/>
+          <Route path='/signup' Component={Register}/>
           <Route path='/' Component={Layout}>
             <Route path='/' Component={Home} />
             <Route path='/search' Component={VideoListPage} />
             <Route path='/videoDetail/:id' Component={VideoDetailPage} />
-
           </Route>
         </Routes>
       </BrowserRouter>
