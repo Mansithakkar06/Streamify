@@ -20,7 +20,7 @@ function Login() {
             }
         } catch (error) {
             console.log("error in login",error)
-            if(error.response.status===400){
+            if(error.response.status!==200){
                 setError("Invalid Credentials!!")
             }
         }

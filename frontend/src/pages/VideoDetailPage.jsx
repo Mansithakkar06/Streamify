@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
 import { api } from '../api/api';
 import VideoSuggestionView from '../components/VideoSuggestionView';
 import { formatTime } from '../utils/formatTime';
@@ -118,6 +118,7 @@ function VideoDetailPage() {
                         </div>
                     </div>
                     <div className='flex justify-between'>
+                        <Link to={`/channel/${video.owner?.username}`}>
                         <div className='flex'>
                             <img src={video?.owner?.avatar?.url} alt="avatar" className='rounded-full h-12 w-12 object-cover shadow-md mt-1' />
                             <div className='p-1 mx-2'>
@@ -125,6 +126,7 @@ function VideoDetailPage() {
                                 <p className='text-sm text-slate-400'>0 Subscribers</p>
                             </div>
                         </div>
+                        </Link>
                         <div className='p-4'>
                             <button className='border p-2 rounded-md hover:cursor-pointer'><FontAwesomeIcon icon={faUserPlus} className='mx-1' /> Subscribe</button>
                         </div>
