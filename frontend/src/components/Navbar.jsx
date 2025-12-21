@@ -10,7 +10,7 @@ function Navbar() {
     const handleSearch=(e)=>{
         e.preventDefault();
         if(!search.trim()) return;
-        navigate(`search?query=${encodeURIComponent(search)}`)
+        navigate(`search?query=${encodeURIComponent(search)}`,{replace:true})
     }
   return (
     <div className='p-2 border-b border-b-white position-sticky top-0 flex justify-between'>
