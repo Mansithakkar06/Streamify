@@ -3,7 +3,11 @@ import logo from '../assets/images/logo.jpg'
 import InputBox from '../components/InputBox'
 import { useForm } from 'react-hook-form'
 import { api } from '../api/api'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+import { useDispatch } from 'react-redux'
+import { login } from '../slices/UserSlice'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faArrowLeft } from '@fortawesome/free-solid-svg-icons'
 
 function Login() {
     const { register,
@@ -11,11 +15,16 @@ function Login() {
         formState: { errors } } = useForm()
     const navigate=useNavigate()
     const [error,setError]=useState("")
+    const dispatch=useDispatch()
+    const [success,setSuccess]=useState("")
 
     const onSubmit = async (data) => {
         try {
             const res=await api.post("/users/login",data)
             if(res.status===200){
+                const userdata=res.data.data
+                dispatch(login(userdata))
+                setSuccess("Login successfull")
                 navigate('/')
             }
         } catch (error) {
@@ -30,6 +39,7 @@ function Login() {
         <div className='min-h-screen flex justify-center items-center'>
             <div className="p-5 w-full max-w-sm m-auto rounded-md shadow-lg">
                 <img src={logo} alt="logo" className='m-auto' />
+                <p className='text-green-800'>{success&&success}</p>
                 <form onSubmit={handleSubmit(onSubmit)} className='px-4 py-2'>
                     {error && <p className='text-red-600'>{error}</p>}
                     <InputBox
@@ -53,6 +63,15 @@ function Login() {
                         error={errors.password?.message}
                     />
                     <button className='border w-full p-2 my-4 rounded-md hover:cursor-pointer hover:bg-gray-600 hover:text-black'>Login</button>
+                     <div className='flex justify-between'>
+                        <div>
+                            <Link to='/'><p className='text-red-400'><FontAwesomeIcon icon={faArrowLeft} />Back</p></Link>
+                        </div>
+                        <div>
+                         <p>Don't have an account?<span className='mx-1 text-blue-500'><Link to='/signup'>signup</Link></span></p>
+                        </div>
+                    </div>
+                    
                 </form>
             </div>
         </div >

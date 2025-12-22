@@ -8,7 +8,8 @@ import mongoose from "mongoose";
 
 const options = {
     httpOnly: true,
-    secure: false
+    secure: false,
+    // sameSite: 'Lax'
 }
 
 const generateTokens = async (userId) => {
@@ -27,117 +28,122 @@ const generateTokens = async (userId) => {
     }
 }
 
-const registerUser = asyncHandler(async (req, res,next) => {
-   try {
-     //get text data from frontend
-     const { username, fullName, email, password } = req.body;
-     //check for empty values
-     if ([username, fullName, email, password].some((field) => field?.trim() === "")) {
-         throw new ApiError(400, "All fields are required!!")
-     }
-     //check for existing user
-     const existingUser = await User.findOne({
-         $or: [{ email }, { username }]
-     })
-     if (existingUser) {
-         throw new ApiError(409, "user with this email or username already exists!!")
-     }
-     //store images localpath
-     const avatarLocalPath = req.files?.avatar[0]?.path;
-     // const coverImageLocalPath=req?.files?.coverImage?.[0]?.path;
-     let coverImageLocalPath;
-     if (req.files && Array.isArray(req.files.coverImage) && req.files.coverImage.length > 0) {
-         coverImageLocalPath = req.files.coverImage[0].path
-     }
-     if (!avatarLocalPath) {
-         throw new ApiError(400, "Avatar is required!!")
-     }
-     //upload images on cloudinary
-     const avatar = await uploadOnCloudinary(avatarLocalPath)
-     const coverImage = await uploadOnCloudinary(coverImageLocalPath)
- 
-     //check if avatar is there
-     if (!avatar) {
-         throw new ApiError(400, "Avatar is required!!")
-     }
-     //create user object and create user
-     const user = await User.create({
-         username: username.toLowerCase(),
-         fullName,
-         email,
-         password,
-         avatar: {
-             url: avatar?.url,
-             public_id: avatar?.public_id
-         },
-         coverImage: {
-             url: coverImage?.url ?? "",
-             public_id: coverImage?.public_id ?? "",
-         }
-     })
-     //remove password and refreshtoken
-     const createdUser = await User.findById(user._id).select("-password -refreshToken")
-     //check if user is created or not
-     if (!createdUser) {
-         throw new ApiError(500, "something went wrong in user registration!!")
-     }
-     return res.status(201).json(
-         new ApiResponse(200, createdUser, "User registered successfully")
-     )
-   } catch (error) {
-    next(error)
-   }
+const registerUser = asyncHandler(async (req, res, next) => {
+    try {
+        //get text data from frontend
+        const { username, fullName, email, password } = req.body;
+        //check for empty values
+        if ([username, fullName, email, password].some((field) => field?.trim() === "")) {
+            throw new ApiError(400, "All fields are required!!")
+        }
+        //check for existing user
+        const existingUser = await User.findOne({
+            $or: [{ email }, { username }]
+        })
+        if (existingUser) {
+            throw new ApiError(409, "user with this email or username already exists!!")
+        }
+        //store images localpath
+        const avatarLocalPath = req.files?.avatar[0]?.path;
+        // const coverImageLocalPath=req?.files?.coverImage?.[0]?.path;
+        let coverImageLocalPath;
+        if (req.files && Array.isArray(req.files.coverImage) && req.files.coverImage.length > 0) {
+            coverImageLocalPath = req.files.coverImage[0].path
+        }
+        if (!avatarLocalPath) {
+            throw new ApiError(400, "Avatar is required!!")
+        }
+        //upload images on cloudinary
+        const avatar = await uploadOnCloudinary(avatarLocalPath)
+        const coverImage = await uploadOnCloudinary(coverImageLocalPath)
+
+        //check if avatar is there
+        if (!avatar) {
+            throw new ApiError(400, "Avatar is required!!")
+        }
+        //create user object and create user
+        const user = await User.create({
+            username: username.toLowerCase(),
+            fullName,
+            email,
+            password,
+            avatar: {
+                url: avatar?.url,
+                public_id: avatar?.public_id
+            },
+            coverImage: {
+                url: coverImage?.url ?? "",
+                public_id: coverImage?.public_id ?? "",
+            }
+        })
+        //remove password and refreshtoken
+        const createdUser = await User.findById(user._id).select("-password -refreshToken")
+        //check if user is created or not
+        if (!createdUser) {
+            throw new ApiError(500, "something went wrong in user registration!!")
+        }
+         //generate tokens
+        const { accsessToken, refreshToken } = await generateTokens(user._id)
+        return res.status(201)
+            .cookie("refreshToken", refreshToken, options)
+            .cookie("accessToken", accsessToken, options)
+            .json(
+                new ApiResponse(200, createdUser, "User registered successfully")
+            )
+    } catch (error) {
+        next(error)
+    }
 })
 
-const loginUser = asyncHandler(async (req, res,next) => {
-   try {
-     //get data from frontend
-     const { username, password } = req.body;
-     //validate null data
-     if (!username) {
-         throw new ApiError(400, "username or email is required!!")
-     }
-     let email;
-     if(username.includes("@")){
-         email=username
-     }
-     //find if user exists or not
-     const user = await User.findOne({
-         $or: [
-             { email },
-             { username }
-         ]
-     });
-     if (!user) {
-         throw new ApiError(400, "user does not exists!!")
-     }
-     //validate password
-     const passwordValidation = await user.isPasswordCorrect(password)
-     if (!passwordValidation) {
-         throw new ApiError(401, "invalid user Credentials!!")
-     }
- 
-     //generate tokens
-     const { accsessToken, refreshToken } = await generateTokens(user._id)
- 
-     //remove fields not to send 
-     const loggedInUser = await User.findById(user._id).select("-password -refreshToken")
-     return res
-         .status(200)
-         .cookie("refreshToken", refreshToken, options)
-         .cookie("accessToken", accsessToken, options)
-         .json(
-             new ApiResponse(
-                 200,
-                 {
-                     user: loggedInUser, accsessToken, refreshToken
-                 },
-                 "User loggedIn successfully!!"
-             )
-         )
-   } catch (error) {
-    next(error)
-   }
+const loginUser = asyncHandler(async (req, res, next) => {
+    try {
+        //get data from frontend
+        const { username, password } = req.body;
+        //validate null data
+        if (!username) {
+            throw new ApiError(400, "username or email is required!!")
+        }
+        let email;
+        if (username.includes("@")) {
+            email = username
+        }
+        //find if user exists or not
+        const user = await User.findOne({
+            $or: [
+                { email },
+                { username }
+            ]
+        });
+        if (!user) {
+            throw new ApiError(400, "user does not exists!!")
+        }
+        //validate password
+        const passwordValidation = await user.isPasswordCorrect(password)
+        if (!passwordValidation) {
+            throw new ApiError(401, "invalid user Credentials!!")
+        }
+
+        //generate tokens
+        const { accsessToken, refreshToken } = await generateTokens(user._id)
+
+        //remove fields not to send 
+        const loggedInUser = await User.findById(user._id).select("-password -refreshToken")
+        return res
+            .status(200)
+            .cookie("refreshToken", refreshToken, options)
+            .cookie("accessToken", accsessToken, options)
+            .json(
+                new ApiResponse(
+                    200,
+                    {
+                        user: loggedInUser, accsessToken, refreshToken
+                    },
+                    "User loggedIn successfully!!"
+                )
+            )
+    } catch (error) {
+        next(error)
+    }
 
 
 })
@@ -361,7 +367,7 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
                 isSubscribed: {
                     $cond: {
                         if: { $in: [req.user?._id, "$subscribers.subscriber"] },
-                        then: true, 
+                        then: true,
                         else: false
                     }
                 }
@@ -434,21 +440,21 @@ const getWatchHistory = asyncHandler(async (req, res) => {
                         }
                     },
                     {
-                        $project:{
-                            title:1,
-                            thumbnail:1,
-                            views:1,
-                            duration:1,
-                            owner:1,
-                            createdAt:1
+                        $project: {
+                            title: 1,
+                            thumbnail: 1,
+                            views: 1,
+                            duration: 1,
+                            owner: 1,
+                            createdAt: 1
                         }
                     }
                 ]
             }
         }
     ])
-    if(!(user[0].watchHistory).length){
-        throw new ApiError(400,"no history!!")
+    if (!(user[0].watchHistory).length) {
+        throw new ApiError(400, "no history!!")
     }
     return res
         .status(200)
@@ -457,57 +463,57 @@ const getWatchHistory = asyncHandler(async (req, res) => {
         )
 })
 
-const removeFromWatchHistory=asyncHandler(async(req,res)=>{
-    const {videoId}=req.params;
-     if (!mongoose.Types.ObjectId.isValid(videoId)) {
+const removeFromWatchHistory = asyncHandler(async (req, res) => {
+    const { videoId } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(videoId)) {
         throw new ApiError(400, "invalid id!!")
     }
-    const oldhistory=await User.findById(req.user?.id)
-    if(!oldhistory.watchHistory.length){
-        throw new ApiError(400,"no history found!!")
+    const oldhistory = await User.findById(req.user?.id)
+    if (!oldhistory.watchHistory.length) {
+        throw new ApiError(400, "no history found!!")
     }
-    if(!(oldhistory.watchHistory).includes(videoId)){
-        throw new ApiError(400,"video does not exists!!")
+    if (!(oldhistory.watchHistory).includes(videoId)) {
+        throw new ApiError(400, "video does not exists!!")
     }
-    const history=await User.findByIdAndUpdate(req.user?.id,
+    const history = await User.findByIdAndUpdate(req.user?.id,
         {
-            $pull:{
-                watchHistory:videoId
+            $pull: {
+                watchHistory: videoId
             }
         },
-        {new:true}
+        { new: true }
     )
-    if(!history){
-        throw new ApiError(500,"error in deleting from history!!")
+    if (!history) {
+        throw new ApiError(500, "error in deleting from history!!")
     }
     return res
-    .status(200)
-    .json(
-        new ApiResponse(200,"video removed from history!!")
-    )    
+        .status(200)
+        .json(
+            new ApiResponse(200, "video removed from history!!")
+        )
 })
 
-const deleteWatchHistory=asyncHandler(async(req,res)=>{
-const oldhistory=await User.findById(req.user?.id)
-    if(!oldhistory.watchHistory.length){
-        throw new ApiError(400,"no history found!!")
+const deleteWatchHistory = asyncHandler(async (req, res) => {
+    const oldhistory = await User.findById(req.user?.id)
+    if (!oldhistory.watchHistory.length) {
+        throw new ApiError(400, "no history found!!")
     }
-    const history=await User.findByIdAndUpdate(req.user?.id,
+    const history = await User.findByIdAndUpdate(req.user?.id,
         {
-            $set:{
-                watchHistory:[]
+            $set: {
+                watchHistory: []
             }
         },
-        {new:true}
+        { new: true }
     )
-    if(!history){
-        throw new ApiError(400,"no history find!!")
+    if (!history) {
+        throw new ApiError(400, "no history find!!")
     }
     return res
-    .status(200)
-    .json(
-        new ApiResponse(200,"history deleted successfully!!")
-    )   
+        .status(200)
+        .json(
+            new ApiResponse(200, "history deleted successfully!!")
+        )
 })
 
 export {

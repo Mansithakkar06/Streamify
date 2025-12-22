@@ -99,8 +99,8 @@ function VideoDetailPage() {
                 <div className='m-auto items-center'>
                     <FadeLoader
                         color="#f3faff"
-                        height={6}
-                        width={12}
+                        height={11}
+                        width={9}
                         radius={3}
                     />
                     <p>Loading...</p>

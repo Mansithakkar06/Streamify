@@ -5,9 +5,11 @@ import { api } from '../api/api';
 import VideoCardView from '../components/VideoCardView';
 import { FadeLoader } from 'react-spinners'
 
+
 function Home() {
   const [videos, setVideos] = useState([])
   const [loading, setLoading] = useState(true)
+  
 
   useEffect(() => {
     const getVideos = async () => {
@@ -24,8 +26,8 @@ function Home() {
         <div className='m-auto items-center'>
         <FadeLoader
           color="#f3faff"
-          height={6}
-          width={12}
+          height={11}
+          width={9}
           radius={3}
         />
         <p>Loading...</p>
