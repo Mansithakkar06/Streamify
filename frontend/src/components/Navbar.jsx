@@ -24,6 +24,7 @@ function Navbar() {
             const res=await api.post('/users/logout');
             if(res.status===200){
                 dispatch(logout())
+                navigate("/")
             }
         } catch (error) {
             console.log("error in logout",error)

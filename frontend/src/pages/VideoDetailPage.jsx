@@ -23,12 +23,30 @@ function VideoDetailPage() {
     const commentHandler = async (e) => {
         e.preventDefault()
         try {
-            const res = await api.post(`/comments/addComment/${id}`, content)
-            console.log(res)
+            const res = await api.post(`/comments/addComment/${id}`, {content})
+            if(res.status===200){
+                console.log(res.data.message)
+                setContent("")
+                setComments(prev=>[...prev,res.data.data])
+            }
         } catch (error) {
             console.log("error in adding comment", error)
         }
 
+    }
+
+    const updateComment=(updatedCmnt)=>{
+        setComments(prev =>
+        prev.map(comment =>
+            comment._id === updatedCmnt._id
+                ? updatedCmnt
+                : comment
+        )
+    )
+    }
+
+    const removeComment=(cmntid)=>{
+        setComments(prev=>prev.filter(cmnt=>cmnt._id!==cmntid))
     }
 
     useEffect(() => {
@@ -169,7 +187,7 @@ function VideoDetailPage() {
                         {
                             comments.map((comment) => (
                                 <div key={comment._id} className='my-1'>
-                                    <CommentView comment={comment} />
+                                    <CommentView comment={comment} onDelete={removeComment} onUpdate={updateComment} />
                                     <hr />
                                 </div>
                             ))

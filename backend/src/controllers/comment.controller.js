@@ -23,9 +23,13 @@ const addComment=asyncHandler(async (req,res) => {
     if(!comment){
         throw new ApiError(500,"error in creating comment!!")
     }
+     const populatedComment = await comment.populate({
+        path: "owner",
+        select: "username avatar fullName"
+    })
     res.status(200)
     .json(
-        new ApiResponse(200,comment,"comment created successfully")
+        new ApiResponse(200,populatedComment,"comment created successfully")
     )
 
 })
@@ -47,10 +51,14 @@ const updateComment=asyncHandler(async(req,res)=>{
         },
         {new:true}
     )
+    const populatedComment = await comment.populate({
+        path: "owner",
+        select: "username avatar fullName"
+    })
     return res
     .status(200)
     .json(
-        new ApiResponse(200,comment,"comment updated successfully")
+        new ApiResponse(200,populatedComment,"comment updated successfully")
     )
 })
 
