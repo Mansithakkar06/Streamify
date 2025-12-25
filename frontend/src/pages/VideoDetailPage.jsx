@@ -5,12 +5,14 @@ import VideoSuggestionView from '../components/VideoSuggestionView';
 import { formatTime } from '../utils/formatTime';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faThumbsDown, faThumbsUp } from '@fortawesome/free-regular-svg-icons';
-import { faFolderPlus, faUserPlus } from '@fortawesome/free-solid-svg-icons';
+import { faFolderPlus, faUserPlus, faThumbsUp as solidThumbsUp, faThumbsDown as solidThumbsDown } from '@fortawesome/free-solid-svg-icons';
 import CommentView from '../components/CommentView';
 import { FadeLoader } from 'react-spinners';
+import { useSelector } from 'react-redux';
 
 function VideoDetailPage() {
     const { id } = useParams()
+    const user = useSelector(state => state.user.userData)
     const [video, setVideo] = useState({})
     const [url, setUrl] = useState("")
     const [suggestions, setSuggestions] = useState([])
@@ -18,16 +20,19 @@ function VideoDetailPage() {
     const [disLikes, setDislikes] = useState(0)
     const [comments, setComments] = useState([])
     const [content, setContent] = useState("")
-    const [loading,setLoading]=useState(true)
+    const [loading, setLoading] = useState(true)
+    const [isLiked, setIsLiked] = useState(false)
+    const [isDisLiked, setIsDisLiked] = useState(false)
+
 
     const commentHandler = async (e) => {
         e.preventDefault()
         try {
-            const res = await api.post(`/comments/addComment/${id}`, {content})
-            if(res.status===200){
+            const res = await api.post(`/comments/addComment/${id}`, { content })
+            if (res.status === 200) {
                 console.log(res.data.message)
                 setContent("")
-                setComments(prev=>[...prev,res.data.data])
+                setComments(prev => [...prev, res.data.data])
             }
         } catch (error) {
             console.log("error in adding comment", error)
@@ -35,21 +40,69 @@ function VideoDetailPage() {
 
     }
 
-    const updateComment=(updatedCmnt)=>{
+    const updateComment = (updatedCmnt) => {
         setComments(prev =>
-        prev.map(comment =>
-            comment._id === updatedCmnt._id
-                ? updatedCmnt
-                : comment
+            prev.map(comment =>
+                comment._id === updatedCmnt._id
+                    ? updatedCmnt
+                    : comment
+            )
         )
-    )
     }
 
-    const removeComment=(cmntid)=>{
-        setComments(prev=>prev.filter(cmnt=>cmnt._id!==cmntid))
+    const removeComment = (cmntid) => {
+        setComments(prev => prev.filter(cmnt => cmnt._id !== cmntid))
+    }
+
+    const handleLike = async () => {
+        try {
+            let reactionType;
+            if (isLiked) {
+                reactionType = "";
+            }
+            else {
+                reactionType = "like"
+            }
+            const res = await api.post(`/likes/toggleVideoLike/${id}`, { reactionType });
+            if (res.status === 200 && res?.data?.data?.reaction === "like") {
+                setIsLiked(true)
+                setIsDisLiked(false)
+            }
+            else {
+                setIsLiked(false)
+            }
+        } catch (error) {
+            console.log("error in like", error)
+        }
+    }
+    const handleDislike = async () => {
+        try {
+            let reactionType;
+            if (isDisLiked) {
+                reactionType = "";
+            }
+            else {
+                reactionType = "dislike"
+            }
+            const res = await api.post(`/likes/toggleVideoLike/${id}`, { reactionType });
+            if (res.status === 200 && res?.data?.data?.reaction === "dislike") {
+                setIsDisLiked(true)
+                setIsLiked(false)
+            }
+            else {
+                setIsDisLiked(false)
+            }
+        } catch (error) {
+            console.log("error in dislike", error)
+        }
+    }
+
+    const handleSubscription=()=>{
+        console.log(video,user._id)
     }
 
     useEffect(() => {
+
         const fetchVideo = async () => {
             try {
                 const res = await api.get(`/videos/getVideoById/${id}`)
@@ -63,7 +116,17 @@ function VideoDetailPage() {
         const fetchVideoLikes = async () => {
             try {
                 const res = await api.get(`/likes/getVideoLikes/${id}`)
-                setLikes(res.data.data)
+                const likes = res.data.data.likes
+                const like = likes.filter((like) => (
+                    like.video === id && like.likedBy === user._id
+                ))
+                if (like.length === 1) {
+                    setIsLiked(true)
+                }
+                else {
+                    setIsLiked(false)
+                }
+                setLikes(res.data.data.likes_count)
             } catch (error) {
                 console.log("error in fetching likes", error)
             }
@@ -72,7 +135,18 @@ function VideoDetailPage() {
         const fetchVideoDislikes = async () => {
             try {
                 const res = await api.get(`/likes/getVideoDislikes/${id}`)
-                setDislikes(res.data.data)
+                const dislikes = res.data.data.dislikes
+                const dislike = dislikes.filter((dislike) => (
+                    dislike.video === id && dislike.likedBy === user._id
+                ))
+                if (dislike.length === 1) {
+                    setIsDisLiked(true)
+                }
+                else {
+                    setIsDisLiked(false)
+                }
+                setDislikes(res.data.data.dislikes_count)
+
             } catch (error) {
                 console.log("error in fetching likes", error)
             }
@@ -90,7 +164,7 @@ function VideoDetailPage() {
         setTimeout(() => {
             setLoading(false)
         }, 3000);
-    }, [id]);
+    }, [id, isLiked]);
     useEffect(() => {
         const suggestionVideos = async () => {
             try {
@@ -151,12 +225,12 @@ function VideoDetailPage() {
                                 <span>{video.views} Views . </span><span>{formatTime(video.createdAt)}</span>
                             </div>
                             <div className='p-3'>
-                                <button className='py-2 px-4 border rounded-l-md hover:cursor-pointer'><FontAwesomeIcon icon={faThumbsUp} /><span>{likes}</span></button>
-                                <button className='py-2 px-4 border rounded-r-md hover:cursor-pointer'><FontAwesomeIcon icon={faThumbsDown} /><span>{disLikes}</span></button>
+                                <button className='py-2 px-4 border rounded-l-md hover:cursor-pointer' onClick={handleLike}><FontAwesomeIcon icon={isLiked ? solidThumbsUp : faThumbsUp} /><span>{likes}</span></button>
+                                <button className='py-2 px-4 border rounded-r-md hover:cursor-pointer' onClick={handleDislike}><FontAwesomeIcon icon={isDisLiked ? solidThumbsDown : faThumbsDown} /><span>{disLikes}</span></button>
                                 <button className='ms-5 border p-2 rounded-md hover:cursor-pointer'><FontAwesomeIcon icon={faFolderPlus} /><span className='px-1'>Save</span></button>
                             </div>
                         </div>
-                        <div className='flex justify-between'>
+                        <div className='flex justify-between py-2'>
                             <Link to={`/channel/${video.owner?.username}`}>
                                 <div className='flex'>
                                     <img src={video?.owner?.avatar?.url} alt="avatar" className='rounded-full h-12 w-12 object-cover shadow-md mt-1' />
@@ -166,9 +240,11 @@ function VideoDetailPage() {
                                     </div>
                                 </div>
                             </Link>
-                            <div className='p-4'>
-                                <button className='border p-2 rounded-md hover:cursor-pointer'><FontAwesomeIcon icon={faUserPlus} className='mx-1' /> Subscribe</button>
-                            </div>
+                            {video.owner.username !== user.username &&
+                                <div className='p-4'>
+                                    <button className='border p-2 rounded-md hover:cursor-pointer' onClick={handleSubscription}><FontAwesomeIcon icon={faUserPlus} className='mx-1' /> Subscribe</button>
+                                </div>
+                            }
                         </div>
                         <hr />
                         <div className='p-1'>

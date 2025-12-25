@@ -13,15 +13,15 @@ const toggleVideoLike = asyncHandler(async (req, res) => {
     }
     //take reaction type
     const { reactionType } = req.body
-    //check for the existing data 
-    const existingLike = await Like.findOne({ video: id }, { likeBy: req.user?.id })
 
+    //check for the existing data 
+    const existingLike = await Like.findOne({ video: id,likedBy: req.user?.id })
     //if reaction type is null then delete that record
     if (!reactionType) {
         if (existingLike) {
             await Like.findByIdAndDelete(existingLike._id)
+            return res.status(200).json(new ApiResponse(200, "reaction removed successfully"))
         }
-        return res.status(200).json(new ApiResponse(200, "reaction removed successfully"))
     }
     //if like/dislike then
     //if data is there update it
@@ -53,7 +53,7 @@ const toggleCommentLike = asyncHandler(async (req, res) => {
     //take reaction type
     const { reactionType } = req.body
     //check for the existing data 
-    const existingComment = await Like.findOne({ comment: id }, { likeBy: req.user?.id })
+    const existingComment = await Like.findOne({ comment: id,likedBy: req.user?.id })
 
     //if reaction type is null then delete that record
     if (!reactionType) {
@@ -96,15 +96,15 @@ const getLikedVideos = asyncHandler(async (req, res) => {
 
 
 const getVideoLikes=asyncHandler(async(req,res)=>{
-    const {videoId}=req.params;
-    const likes=await Like.find({video:videoId,reaction:"like"})
-    return res.status(200).json(new ApiResponse(200,likes.length,"video likes fetched successfully"))
+    const {id}=req.params;
+    const likes=await Like.find({video:id,reaction:"like"})
+    return res.status(200).json(new ApiResponse(200,{"likes":likes,"likes_count":likes.length},"video likes fetched successfully"))
 })
 
 const getVideoDislikes=asyncHandler(async(req,res)=>{
-    const {videoId}=req.params;
-    const likes=await Like.find({video:videoId,reaction:"dislike"})
-    return res.status(200).json(new ApiResponse(200,likes.length,"video dislikes fetched successfully"))
+    const {id}=req.params;
+    const dislikes=await Like.find({video:id,reaction:"dislike"})
+    return res.status(200).json(new ApiResponse(200,{"dislikes":dislikes,"dislikes_count":dislikes.length},"video dislikes fetched successfully"))
 })
 
 export {
