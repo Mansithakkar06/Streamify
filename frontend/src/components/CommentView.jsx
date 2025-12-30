@@ -55,7 +55,7 @@ function CommentView({ comment, onDelete,onUpdate }) {
                 </div>
             </div>
             {
-                comment.owner._id === user._id &&
+                comment.owner._id === user?._id &&
                 <div className='right-0 p-3 mx-3'>
                     <button className='hover:cursor-pointer'><FontAwesomeIcon icon={faEdit} className='mx-1' onClick={() => handleEdit(comment._id)} /></button>
                     <button className='hover:cursor-pointer' onClick={() => handleDeleteComment(comment._id)}><FontAwesomeIcon icon={faTrash} className='mx-1' /></button>

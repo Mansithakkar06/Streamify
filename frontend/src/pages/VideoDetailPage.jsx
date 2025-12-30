@@ -5,7 +5,7 @@ import VideoSuggestionView from '../components/VideoSuggestionView';
 import { formatTime } from '../utils/formatTime';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faThumbsDown, faThumbsUp } from '@fortawesome/free-regular-svg-icons';
-import { faFolderPlus, faUserPlus, faThumbsUp as solidThumbsUp, faThumbsDown as solidThumbsDown } from '@fortawesome/free-solid-svg-icons';
+import { faFolderPlus, faUserPlus, faThumbsUp as solidThumbsUp, faThumbsDown as solidThumbsDown, faUserXmark } from '@fortawesome/free-solid-svg-icons';
 import CommentView from '../components/CommentView';
 import { FadeLoader } from 'react-spinners';
 import { useSelector } from 'react-redux';
@@ -23,6 +23,8 @@ function VideoDetailPage() {
     const [loading, setLoading] = useState(true)
     const [isLiked, setIsLiked] = useState(false)
     const [isDisLiked, setIsDisLiked] = useState(false)
+    const [subscribers, setSubscribers] = useState(0)
+    const [isSubscribed, setIsSubscribed] = useState(false);
 
 
     const commentHandler = async (e) => {
@@ -30,7 +32,6 @@ function VideoDetailPage() {
         try {
             const res = await api.post(`/comments/addComment/${id}`, { content })
             if (res.status === 200) {
-                console.log(res.data.message)
                 setContent("")
                 setComments(prev => [...prev, res.data.data])
             }
@@ -97,8 +98,20 @@ function VideoDetailPage() {
         }
     }
 
-    const handleSubscription=()=>{
-        console.log(video,user._id)
+    const handleSubscription = async () => {
+        try {
+            const channelId = video.owner._id;
+            const res = await api.post(`/subscriptions/toggleSubscription/${channelId}`)
+            if(res.status===201){
+                setIsSubscribed(true)
+            }
+            else{
+                setIsSubscribed(false)
+            }
+        } catch (error) {
+            console.log("error in subscription", error)
+        }
+
     }
 
     useEffect(() => {
@@ -108,6 +121,17 @@ function VideoDetailPage() {
                 const res = await api.get(`/videos/getVideoById/${id}`)
                 setVideo(res.data.data)
                 setUrl(res.data.data.videoFile.url)
+                const channelId = res.data.data.owner._id
+                const subscribers = await api.get(`/subscriptions/getChannelSubscribers/${channelId}`)
+                setSubscribers(subscribers?.data?.data?.length)
+                const channelsubscribed = subscribers?.data?.data
+                const subscribed = channelsubscribed.filter((subscribed) => (
+                    subscribed?.subscriber._id === user._id && channelId === subscribed?.channel
+                ))
+                if (subscribed?.length !== 0) {
+                    setIsSubscribed(true)
+                }
+
             } catch (error) {
                 console.log("error in fetching video", error)
             }
@@ -118,7 +142,7 @@ function VideoDetailPage() {
                 const res = await api.get(`/likes/getVideoLikes/${id}`)
                 const likes = res.data.data.likes
                 const like = likes.filter((like) => (
-                    like.video === id && like.likedBy === user._id
+                    like.video === id && like.likedBy === user?._id
                 ))
                 if (like.length === 1) {
                     setIsLiked(true)
@@ -137,7 +161,7 @@ function VideoDetailPage() {
                 const res = await api.get(`/likes/getVideoDislikes/${id}`)
                 const dislikes = res.data.data.dislikes
                 const dislike = dislikes.filter((dislike) => (
-                    dislike.video === id && dislike.likedBy === user._id
+                    dislike.video === id && dislike.likedBy === user?._id
                 ))
                 if (dislike.length === 1) {
                     setIsDisLiked(true)
@@ -161,10 +185,11 @@ function VideoDetailPage() {
             }
         }
         fetchComments()
+
         setTimeout(() => {
             setLoading(false)
         }, 3000);
-    }, [id, isLiked]);
+    }, [id, isLiked,isSubscribed]);
     useEffect(() => {
         const suggestionVideos = async () => {
             try {
@@ -180,10 +205,10 @@ function VideoDetailPage() {
         }
         suggestionVideos()
     }, [video]);
-    useEffect(() => {
-        console.log(video)
-        console.log(url)
-    }, []);
+    // useEffect(() => {
+    //     console.log(video)
+    //     console.log(url)
+    // }, []);
 
     if (loading) {
         return (
@@ -236,13 +261,13 @@ function VideoDetailPage() {
                                     <img src={video?.owner?.avatar?.url} alt="avatar" className='rounded-full h-12 w-12 object-cover shadow-md mt-1' />
                                     <div className='p-1 mx-2'>
                                         <p className='text-lg'>{(video?.owner?.username)?.replace(/^./, char => char.toUpperCase())}</p>
-                                        <p className='text-sm text-slate-400'>0 Subscribers</p>
+                                        <p className='text-sm text-slate-400'>{subscribers} {subscribers === 1 ? "Subscriber" : "Subscribers"}</p>
                                     </div>
                                 </div>
                             </Link>
-                            {video.owner.username !== user.username &&
+                            {video?.owner?.username !== user?.username &&
                                 <div className='p-4'>
-                                    <button className='border p-2 rounded-md hover:cursor-pointer' onClick={handleSubscription}><FontAwesomeIcon icon={faUserPlus} className='mx-1' /> Subscribe</button>
+                                    <button className='border p-2 rounded-md hover:cursor-pointer' onClick={handleSubscription}><FontAwesomeIcon icon={isSubscribed ? faUserXmark : faUserPlus} className='mx-1' /> {isSubscribed ? "Unsubscribe" : "Subscribe"}</button>
                                 </div>
                             }
                         </div>

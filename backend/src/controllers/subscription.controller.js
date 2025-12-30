@@ -27,9 +27,9 @@ const toggleSubscription = asyncHandler(async (req, res) => {
         throw new ApiError(500, "error in creating subscription!!")
     }
     return res
-        .status(200)
+        .status(201)
         .json(
-            new ApiResponse(200, subscription, "subscription successfull!!")
+            new ApiResponse(201, subscription, "subscription successfull!!")
         )
 })
 
@@ -74,7 +74,10 @@ const getChannelSubscribers = asyncHandler(async (req, res) => {
         }
     ])
     if(!subscribers.length){
-        throw new ApiError(500,"error fetching subscribers!!")
+        return res
+        .status(200)
+        .json(
+            new ApiResponse(200,subscribers,"no subscribers yet"))
     }
     return res.status(200).json(new ApiResponse(200,subscribers,"subscribers fetched successfully"))
 })
