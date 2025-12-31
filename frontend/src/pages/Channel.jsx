@@ -41,6 +41,7 @@ function Channel() {
 
   }, [channel]);
 
+  console.log(channel)
   if (!channel) {
     return (
       <div className='p-4 flex items-center m-auto justify-center h-screen w-full'>
