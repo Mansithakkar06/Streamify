@@ -22,7 +22,7 @@ function Home() {
 
   if (loading) {
     return (
-      <div className='flex items-center m-auto justify-center h-screen w-full'>
+      <div className='p-4 flex items-center m-auto justify-center h-screen w-full'>
         <div className='m-auto items-center'>
         <FadeLoader
           color="#f3faff"
@@ -37,7 +37,7 @@ function Home() {
   }
   else {
     return videos.length === 0 ? (
-      <div className='flex items-center m-auto justify-center h-screen w-full'>
+      <div className='p-4 flex items-center m-auto justify-center h-screen w-full'>
         <div className='m-auto'>
           <p className='text-3xl text-center m-2 '> <FontAwesomeIcon icon={faPlayCircle} /> </p>
           <h2 className='text-center text-2xl'>No videos Available!!</h2>
@@ -46,7 +46,7 @@ function Home() {
       </div>
     )
       : (
-        <div className='grid grid-cols-4 gap-x-5 gap-y-1'>
+        <div className='p-4 grid grid-cols-4 gap-x-5 gap-y-1'>
           {videos.map((video) => (
             <div key={video._id} className='mx-2'>
               <VideoCardView video={video} />

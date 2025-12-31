@@ -3,23 +3,139 @@ import { useState } from 'react';
 import { useEffect } from 'react';
 import { useParams } from 'react-router-dom'
 import { api } from '../api/api';
+import { FadeLoader } from 'react-spinners';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPlayCircle, faUserPlus, faUserXmark } from '@fortawesome/free-solid-svg-icons';
+import VideoCardView from '../components/VideoCardView';
+import ChannelVideos from './ChannelVideos';
+import Playlist from './ChannelPlaylist';
+import ChannelPlaylist from './ChannelPlaylist';
+import ChannelSubscribed from './ChannelSubscribed';
 
 function Channel() {
-    const {username}=useParams()
-    const [channel,setChannel]=useState("")
-    useEffect(() => {
-        const fetchChannel=async()=>{
-            const res=await api.get(`/users/channel/${username}`)
-            setChannel(res.data.data)
+  const { username } = useParams()
+  const [channel, setChannel] = useState(null)
+  const [isActive, setIsActive] = useState("Videos")
+  const [videos, setVideos] = useState([])
+
+  const tabs = ["Videos", "Playlist", "Subscribed"]
+
+  useEffect(() => {
+    const fetchChannel = async () => {
+      const res = await api.get(`/users/channel/${username}`)
+      setChannel(res.data.data)
+    }
+    fetchChannel()
+  }, [username]);
+
+  useEffect(() => {
+    const fetchVideos = async () => {
+      const res = await api.get("/videos/getAllVideos", {
+        params: {
+          userId: channel?._id
         }
-        fetchChannel()
-    }, []);
-    console.log(channel)
+      })
+      setVideos(res.data.data)
+    }
+    fetchVideos()
+
+  }, [channel]);
+
+  if (!channel) {
+    return (
+      <div className='p-4 flex items-center m-auto justify-center h-screen w-full'>
+        <div className='m-auto items-center'>
+          <FadeLoader
+            color="#f3faff"
+            height={11}
+            width={9}
+            radius={3}
+          />
+          <p>Loading...</p>
+        </div>
+      </div>
+    )
+  }
   return (
-    <div>
-      dded
+    <div className="min-h-screen text-white font-sans">
+      <div className="max-w-7xl mx-auto">
+        <div className="w-full h-32 md:h-52 overflow-hidden relative">
+          <img
+            src={channel.coverImage.url ? channel.coverImage.url : "https://images.unsplash.com/photo-1614850523060-8da1d56ae167?q=80&w=2670&auto=format&fit=crop"}
+            alt="cover image"
+            className="w-full h-full object-cover"
+          />
+        </div>
+
+        <div className="px-4 md:px-12 pb-4">
+          <div className="flex flex-col md:flex-row items-start gap-4 md:gap-6">
+            <div className="relative -mt-6 md:-mt-10 z-10 shrink-0">
+              <img
+                src={channel.avatar.url}
+                alt="Profile"
+                className="w-24 h-24 md:w-32 md:h-32 rounded-full object-cover border-3 shadow-lg"
+              />
+            </div>
+
+            <div className="grow flex flex-col md:flex-row justify-between items-start md:items-center w-full gap-4 md:gap-0 md:pt-4">
+              <div className="flex flex-col gap-1">
+                <h1 className="text-xl md:text-2xl font-bold tracking-tight text-white flex items-center gap-2">
+                  {channel.fullName}
+                </h1>
+                <div className="flex flex-col text-gray-400 text-sm md:text-base">
+                  <span className="font-medium text-gray-400">@{channel.username}</span>
+                  <div className="flex items-center gap-2 text-gray-400 text-sm mt-1">
+                    <span>{channel.subscribersCount} {channel.subscribersCount === 1 ? "Subscriber" : "Subscribers"}</span>
+                    <span className="w-1 h-1 bg-gray-500 rounded-full"></span>
+                    <span>{channel.channelsSubscribedToCount} Subscribed</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="md:ml-auto w-full md:w-auto">
+                <button className="w-full md:w-auto flex justify-center items-center gap-2 bg-[#8B5CF6] hover:bg-[#7c3aed] text-black font-semibold px-6 py-2.5 rounded-full transition-colors duration-200 cursor-pointer">
+                  <FontAwesomeIcon icon={channel.isSubscribed ? faUserXmark : faUserPlus} />
+                  <span>{channel.isSubscribed ? "Unsubscribe" : "Subscribe"}</span>
+                </button>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className='p-3 mx-3 '>
+        <ul className='flex justify-between mb-2 text-center text-gray-400 '>
+          {
+            tabs.map((tab) => (
+              <div key={tab}>
+                <button className='cursor-pointer' onClick={() => setIsActive(tab)}>
+                  <li className={`text-center shrink-0 px-28 py-2 ${isActive === tab ? "bg-slate-100 border-b-2" : ""}`}>{tab}</li>
+                </button>
+              </div>
+            ))
+          }
+        </ul>
+        <hr />
+      </div>
+      {
+        (()=>{
+          switch (isActive){
+            case "Videos":
+            return <ChannelVideos videos={videos} />
+            case "Playlist":
+            return <ChannelPlaylist/>
+            case "Subscribed":
+            return <ChannelSubscribed/>
+          }
+        }
+
+        )()
+      }
     </div>
-  )
+
+  );
+
 }
 
 export default Channel

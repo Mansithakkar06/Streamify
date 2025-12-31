@@ -212,7 +212,7 @@ function VideoDetailPage() {
 
     if (loading) {
         return (
-            <div className='flex items-center m-auto justify-center h-screen w-full'>
+            <div className='p-4 flex items-center m-auto justify-center h-screen w-full'>
                 <div className='m-auto items-center'>
                     <FadeLoader
                         color="#f3faff"
@@ -227,7 +227,7 @@ function VideoDetailPage() {
     }
     else {
         return (
-            <div className='flex gap-3'>
+            <div className='p-4 flex gap-3'>
                 <div className=''>
                     <video
                         src={url}
@@ -267,7 +267,7 @@ function VideoDetailPage() {
                             </Link>
                             {video?.owner?.username !== user?.username &&
                                 <div className='p-4'>
-                                    <button className='border p-2 rounded-md hover:cursor-pointer' onClick={handleSubscription}><FontAwesomeIcon icon={isSubscribed ? faUserXmark : faUserPlus} className='mx-1' /> {isSubscribed ? "Unsubscribe" : "Subscribe"}</button>
+                                    <button className='w-full md:w-auto flex justify-center items-center gap-2 bg-[#8B5CF6] hover:bg-[#7c3aed] text-black font-semibold px-4 py-2.5 rounded-full transition-colors duration-200 cursor-pointer' onClick={handleSubscription}><FontAwesomeIcon icon={isSubscribed ? faUserXmark : faUserPlus} className='mx-1' /> {isSubscribed ? "Unsubscribe" : "Subscribe"}</button>
                                 </div>
                             }
                         </div>
