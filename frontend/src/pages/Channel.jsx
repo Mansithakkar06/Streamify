@@ -10,7 +10,7 @@ import VideoCardView from '../components/VideoCardView';
 import ChannelVideos from './ChannelVideos';
 import Playlist from './ChannelPlaylist';
 import ChannelPlaylist from './ChannelPlaylist';
-import ChannelSubscribed from './ChannelSubscribed';
+import ChannelSubscribers from './ChannelSubscribers';
 
 function Channel() {
   const { username } = useParams()
@@ -18,7 +18,7 @@ function Channel() {
   const [isActive, setIsActive] = useState("Videos")
   const [videos, setVideos] = useState([])
 
-  const tabs = ["Videos", "Playlist", "Subscribed"]
+  const tabs = ["Videos", "Playlist", "Subscribers"]
 
   useEffect(() => {
     const fetchChannel = async () => {
@@ -41,7 +41,7 @@ function Channel() {
 
   }, [channel]);
 
-  console.log(channel)
+  // console.log(channel)
   if (!channel) {
     return (
       <div className='p-4 flex items-center m-auto justify-center h-screen w-full'>
@@ -111,7 +111,7 @@ function Channel() {
             tabs.map((tab) => (
               <div key={tab}>
                 <button className='cursor-pointer' onClick={() => setIsActive(tab)}>
-                  <li className={`text-center shrink-0 px-28 py-2 ${isActive === tab ? "bg-slate-100 border-b-2" : ""}`}>{tab}</li>
+                  <li className={`text-center shrink-0 px-32 py-2 ${isActive === tab ? "bg-slate-100 border-b-2" : ""}`}>{tab}</li>
                 </button>
               </div>
             ))
@@ -126,8 +126,8 @@ function Channel() {
             return <ChannelVideos videos={videos} />
             case "Playlist":
             return <ChannelPlaylist/>
-            case "Subscribed":
-            return <ChannelSubscribed/>
+            case "Subscribers":
+            return <ChannelSubscribers channel={channel}/>
           }
         }
 
