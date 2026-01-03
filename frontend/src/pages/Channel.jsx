@@ -11,22 +11,46 @@ import ChannelVideos from './ChannelVideos';
 import Playlist from './ChannelPlaylist';
 import ChannelPlaylist from './ChannelPlaylist';
 import ChannelSubscribers from './ChannelSubscribers';
+import { useSelector } from 'react-redux';
+import { faEdit } from '@fortawesome/free-regular-svg-icons';
 
 function Channel() {
-  const { username } = useParams()
+  const { username,activeTab } = useParams()
+  const user = useSelector(state => state.user.userData)
   const [channel, setChannel] = useState(null)
   const [isActive, setIsActive] = useState("Videos")
   const [videos, setVideos] = useState([])
-
+  const [isSubscribed,setIsSubscribed]=useState(false)
   const tabs = ["Videos", "Playlist", "Subscribers"]
 
+  const handleSubscription = async () => {
+    try {
+      const channelId = channel._id;
+      const res = await api.post(`/subscriptions/toggleSubscription/${channelId}`)
+      if (res.status === 201) {
+        setIsSubscribed(true)
+      }
+      else {
+        setIsSubscribed(false)
+      }
+    } catch (error) {
+      console.log("error in subscription", error)
+    }
+
+  }
+
+  useEffect(() => {
+    setIsActive(activeTab)
+  }, [activeTab]);
+  
   useEffect(() => {
     const fetchChannel = async () => {
       const res = await api.get(`/users/channel/${username}`)
       setChannel(res.data.data)
+      setIsSubscribed(res.data.data.isSubscribed)
     }
     fetchChannel()
-  }, [username]);
+  }, [username,isSubscribed]);
 
   useEffect(() => {
     const fetchVideos = async () => {
@@ -41,7 +65,6 @@ function Channel() {
 
   }, [channel]);
 
-  // console.log(channel)
   if (!channel) {
     return (
       <div className='p-4 flex items-center m-auto justify-center h-screen w-full'>
@@ -94,10 +117,20 @@ function Channel() {
               </div>
 
               <div className="md:ml-auto w-full md:w-auto">
-                <button className="w-full md:w-auto flex justify-center items-center gap-2 bg-[#8B5CF6] hover:bg-[#7c3aed] text-black font-semibold px-6 py-2.5 rounded-full transition-colors duration-200 cursor-pointer">
-                  <FontAwesomeIcon icon={channel.isSubscribed ? faUserXmark : faUserPlus} />
-                  <span>{channel.isSubscribed ? "Unsubscribe" : "Subscribe"}</span>
-                </button>
+                {
+                  username === user.username ? (
+                    <button className="w-full md:w-auto flex justify-center items-center gap-2 bg-[#8B5CF6] hover:bg-[#7c3aed] text-black font-semibold px-6 py-2.5 rounded-full transition-colors duration-200 cursor-pointer">
+                      <FontAwesomeIcon icon={faEdit} />
+                      <span>Edit</span>
+                    </button>
+                  ) :
+                    (
+                      <button className="w-full md:w-auto flex justify-center items-center gap-2 bg-[#8B5CF6] hover:bg-[#7c3aed] text-black font-semibold px-6 py-2.5 rounded-full transition-colors duration-200 cursor-pointer" onClick={handleSubscription}>
+                        <FontAwesomeIcon icon={isSubscribed ? faUserXmark : faUserPlus} />
+                        <span>{isSubscribed ? "Unsubscribe" : "Subscribe"}</span>
+                      </button>
+                    )
+                }
               </div>
 
             </div>
@@ -120,14 +153,14 @@ function Channel() {
         <hr />
       </div>
       {
-        (()=>{
-          switch (isActive){
+        (() => {
+          switch (isActive) {
             case "Videos":
-            return <ChannelVideos videos={videos} />
+              return <ChannelVideos videos={videos} />
             case "Playlist":
-            return <ChannelPlaylist/>
+              return <ChannelPlaylist />
             case "Subscribers":
-            return <ChannelSubscribers channel={channel}/>
+              return <ChannelSubscribers channel={channel} isSubscribed={isSubscribed} />
           }
         }
 

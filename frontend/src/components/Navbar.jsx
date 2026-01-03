@@ -48,7 +48,7 @@ function Navbar() {
                         <form onSubmit={logoutHandler} className='p-1'>
                             <button className='mx-3 hover:cursor-pointer hover:text-gray-400 hover:bg-gray-600'>Logout</button>
                         </form>
-                        <Link to='#' className='mx-3 hover:cursor-pointer hover:text-gray-400 hover:bg-gray-600'>
+                        <Link to={`/channel/${user.username}/Videos`} className='mx-3 hover:cursor-pointer hover:text-gray-400 hover:bg-gray-600'>
                             <img src={user.avatar.url} alt="avatar" className='rounded-full h-10 w-10 object-cover shadow-md' />
                         </Link>
                     </div>

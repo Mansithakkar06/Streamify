@@ -256,7 +256,7 @@ function VideoDetailPage() {
                             </div>
                         </div>
                         <div className='flex justify-between py-2'>
-                            <Link to={`/channel/${video.owner?.username}`}>
+                            <Link to={`/channel/${video.owner?.username}/Videos`}>
                                 <div className='flex'>
                                     <img src={video?.owner?.avatar?.url} alt="avatar" className='rounded-full h-12 w-12 object-cover shadow-md mt-1' />
                                     <div className='p-1 mx-2'>

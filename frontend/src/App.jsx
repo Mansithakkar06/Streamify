@@ -11,6 +11,7 @@ import VideoDetailPage from './pages/VideoDetailPage'
 import Login from './pages/Login'
 import Register from './pages/Register'
 import Channel from './pages/Channel'
+import Settings from './pages/Settings'
 
 function App() {
 
@@ -24,8 +25,8 @@ function App() {
             <Route path='/' Component={Home} />
             <Route path='/search' Component={VideoListPage} />
             <Route path='/videoDetail/:id' Component={VideoDetailPage} />
-            <Route path='/channel/:username' Component={Channel} />
-
+            <Route path='/channel/:username/:activeTab' Component={Channel} />
+            <Route path='/settings' Component={Settings} />
           </Route>
         </Routes>
       </BrowserRouter>

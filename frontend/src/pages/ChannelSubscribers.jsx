@@ -3,11 +3,11 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import React, { useEffect, useState } from 'react'
 import { api } from '../api/api';
 import SubscriberView from '../components/SubscriberView';
+import { useParams } from 'react-router-dom';
 
-function ChannelSubscribers({channel}) {
+function ChannelSubscribers({channel,isSubscribed}) {
   const [subscribers, setSubscribers] = useState(null);
   const [subscribersLength, setsubscribersLength] = useState(0);
-
 
   useEffect(() => {
     const fetchSubscribers=async()=>{
@@ -16,7 +16,7 @@ function ChannelSubscribers({channel}) {
       setsubscribersLength(res.data.data.length)
     }
     fetchSubscribers()
-  }, []);
+  }, [channel,isSubscribed]);
   
   // console.log(subscribers.length)
   return subscribersLength===0 ? (
