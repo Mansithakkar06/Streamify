@@ -1,11 +1,11 @@
 import React from 'react'
 import { useState } from 'react';
 import { useEffect } from 'react';
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { api } from '../api/api';
 import { FadeLoader } from 'react-spinners';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlayCircle, faUserPlus, faUserXmark } from '@fortawesome/free-solid-svg-icons';
+import { faPlayCircle, faPlus, faUserPlus, faUserXmark } from '@fortawesome/free-solid-svg-icons';
 import VideoCardView from '../components/VideoCardView';
 import ChannelVideos from './ChannelVideos';
 import Playlist from './ChannelPlaylist';
@@ -13,15 +13,21 @@ import ChannelPlaylist from './ChannelPlaylist';
 import ChannelSubscribers from './ChannelSubscribers';
 import { useSelector } from 'react-redux';
 import { faEdit } from '@fortawesome/free-regular-svg-icons';
+import Modal from '../components/Modal';
+import AddVideo from './AddVideo';
+import Uploading from './Uploading';
+import Uploaded from './Uploaded';
 
 function Channel() {
-  const { username,activeTab } = useParams()
+  const { username, activeTab } = useParams()
   const user = useSelector(state => state.user.userData)
   const [channel, setChannel] = useState(null)
   const [isActive, setIsActive] = useState("Videos")
   const [videos, setVideos] = useState([])
-  const [isSubscribed,setIsSubscribed]=useState(false)
+  const [isSubscribed, setIsSubscribed] = useState(false)
   const tabs = ["Videos", "Playlist", "Subscribers"]
+  const [modalType, setModalType] = useState(null);
+  const navigate = useNavigate()
 
   const handleSubscription = async () => {
     try {
@@ -39,10 +45,35 @@ function Channel() {
 
   }
 
+  const handleAddModal = () => {
+    setModalType("add")
+  }
+
+  const handleUploading = () => {
+    setModalType("uploading")
+  }
+
+  const closeModal = () => {
+    setModalType(null)
+  }
+
+  // const handleOnSuccess = () => {
+  //   closeModal()
+  // }
+
+  const handleUploaded = () => {
+    setModalType("uploaded")
+  }
+
+  const handleAfterUploaded = () => {
+    closeModal()
+    navigate(0)
+  }
+
   useEffect(() => {
     setIsActive(activeTab)
   }, [activeTab]);
-  
+
   useEffect(() => {
     const fetchChannel = async () => {
       const res = await api.get(`/users/channel/${username}`)
@@ -50,7 +81,11 @@ function Channel() {
       setIsSubscribed(res.data.data.isSubscribed)
     }
     fetchChannel()
-  }, [username,isSubscribed]);
+  }, [username, isSubscribed]);
+
+  useEffect(() => {
+    console.log("Modal Type:", modalType);
+  }, [modalType]);
 
   useEffect(() => {
     const fetchVideos = async () => {
@@ -64,7 +99,6 @@ function Channel() {
     fetchVideos()
 
   }, [channel]);
-
   if (!channel) {
     return (
       <div className='p-4 flex items-center m-auto justify-center h-screen w-full'>
@@ -119,10 +153,18 @@ function Channel() {
               <div className="md:ml-auto w-full md:w-auto">
                 {
                   username === user.username ? (
-                    <button className="w-full md:w-auto flex justify-center items-center gap-2 bg-[#8B5CF6] hover:bg-[#7c3aed] text-black font-semibold px-6 py-2.5 rounded-full transition-colors duration-200 cursor-pointer">
-                      <FontAwesomeIcon icon={faEdit} />
-                      <span>Edit</span>
-                    </button>
+                    <div className='flex justify-between gap-3'>
+
+                      <button className="w-full md:w-auto flex justify-center items-center gap-2 bg-[#8B5CF6] hover:bg-[#7c3aed] text-black font-semibold px-6 py-2.5 rounded-full transition-colors duration-200 cursor-pointer" onClick={handleAddModal}>
+                        <FontAwesomeIcon icon={faPlus} />
+                        <span>Add Video</span>
+                      </button>
+
+                      <button className="w-full md:w-auto flex justify-center items-center gap-2 bg-[#8B5CF6] hover:bg-[#7c3aed] text-black font-semibold px-6 py-2.5 rounded-full transition-colors duration-200 cursor-pointer">
+                        <FontAwesomeIcon icon={faEdit} />
+                        <span>Edit</span>
+                      </button>
+                    </div>
                   ) :
                     (
                       <button className="w-full md:w-auto flex justify-center items-center gap-2 bg-[#8B5CF6] hover:bg-[#7c3aed] text-black font-semibold px-6 py-2.5 rounded-full transition-colors duration-200 cursor-pointer" onClick={handleSubscription}>
@@ -166,6 +208,11 @@ function Channel() {
 
         )()
       }
+      <Modal isOpen={modalType !== null} onClose={closeModal} title={modalType === "add" ? "Upload Video" : modalType==="edit"? "Edit Video":""}>
+        {modalType === 'add' && <AddVideo onUploading={handleUploading} onUploaded={handleUploaded} />}
+        {modalType === "uploading" && <Uploading />}
+        {modalType === "uploaded" && <Uploaded onclose={handleAfterUploaded} />}
+      </Modal>
     </div>
 
   );

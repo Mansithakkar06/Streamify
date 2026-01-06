@@ -1,9 +1,9 @@
 import React from 'react'
 
-function InputBox({id,label,type="text",placeholder,register,error}) {
+function InputBox({id,label,type="text",placeholder,register,error,required}) {
   return (
     <div className='my-1'>
-      <label htmlFor={id}> {label} <span className=''>*</span></label>
+      <label htmlFor={id}> {label} <span className=''>{!required?"":"*"}</span></label>
         <input type={type}
          id={id} 
          placeholder={placeholder} 

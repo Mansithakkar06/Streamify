@@ -3,7 +3,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import React, { useEffect, useState } from 'react'
 import { api } from '../api/api';
 import SubscriberView from '../components/SubscriberView';
-import { useParams } from 'react-router-dom';
 
 function ChannelSubscribers({channel,isSubscribed}) {
   const [subscribers, setSubscribers] = useState(null);

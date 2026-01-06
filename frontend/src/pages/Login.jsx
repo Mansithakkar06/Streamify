@@ -50,6 +50,7 @@ function Login() {
                             required: "username or email is required!!"
                         })}
                         error={errors.username?.message}
+                        required={true}
                     />
 
                     <InputBox
@@ -61,6 +62,7 @@ function Login() {
                             required: "password is required!!"
                         })}
                         error={errors.password?.message}
+                        required={true}
                     />
                     <button className='border w-full p-2 my-4 rounded-md hover:cursor-pointer hover:bg-gray-600 hover:text-black'>Login</button>
                      <div className='flex justify-between'>

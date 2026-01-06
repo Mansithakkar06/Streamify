@@ -56,6 +56,7 @@ function Register() {
                             required: "username or email is required!!"
                         })}
                         error={errors.username?.message}
+                        required={true}
                     />
                     <InputBox
                         id="fullName"
@@ -65,6 +66,7 @@ function Register() {
                             required: "Full Name is required!!"
                         })}
                         error={errors.fullName?.message}
+                        required={true}
                     />
                     <InputBox
                         type='email'
@@ -75,6 +77,7 @@ function Register() {
                             required: "email is required!!"
                         })}
                         error={errors.email?.message}
+                        required={true}
                     />
                     <InputBox
                         type='password'
@@ -85,6 +88,7 @@ function Register() {
                             required: "Password is required!!"
                         })}
                         error={errors.password?.message}
+                        required={true}
                     />
                     <InputBox
                         type='password'
@@ -98,6 +102,7 @@ function Register() {
 
                         })}
                         error={errors.confirm_password?.message}
+                        required={true}
                     />
                     <InputBox
                         type='file'
@@ -107,6 +112,7 @@ function Register() {
                             required: "Avatar is required!!"
                         })}
                         error={errors.avatar?.message}
+                        required={true}
                     />
                     <InputBox
                         type='file'
@@ -114,6 +120,7 @@ function Register() {
                         label="Cover Image"
                         register={register("coverImage")}
                         error={errors.coverImage?.message}
+                        required={false}
                     />
                     <button className='border w-full p-2 my-4 rounded-md hover:cursor-pointer hover:bg-gray-600 hover:text-black'>Register</button>
                     <div className='flex justify-between'>
