@@ -17,6 +17,8 @@ import Modal from '../components/Modal';
 import AddVideo from './AddVideo';
 import Uploading from './Uploading';
 import Uploaded from './Uploaded';
+import EditChannelInfo from './EditChannelInfo';
+import ChangePassword from './ChangePassword';
 
 function Channel() {
   const { username, activeTab } = useParams()
@@ -26,6 +28,8 @@ function Channel() {
   const [videos, setVideos] = useState([])
   const [isSubscribed, setIsSubscribed] = useState(false)
   const tabs = ["Videos", "Playlist", "Subscribers"]
+  const editTabs=["Channel information","Change Password"]
+  const [isEditable, setIsEditable] = useState(false);
   const [modalType, setModalType] = useState(null);
   const navigate = useNavigate()
 
@@ -45,29 +49,24 @@ function Channel() {
 
   }
 
-  const handleAddModal = () => {
-    setModalType("add")
-  }
-
-  const handleUploading = () => {
-    setModalType("uploading")
-  }
-
-  const closeModal = () => {
-    setModalType(null)
-  }
-
-  // const handleOnSuccess = () => {
-  //   closeModal()
-  // }
-
-  const handleUploaded = () => {
-    setModalType("uploaded")
-  }
-
+  const handleAddModal = () => setModalType("add")
+  const handleUploading = () => setModalType("uploading")
+  const closeModal = () => setModalType(null)
+  const handleUploaded = () => setModalType("uploaded")
+  
   const handleAfterUploaded = () => {
     closeModal()
     navigate(0)
+  }
+
+  const handleEdit=()=>{
+    setIsEditable(true)
+    setIsActive("Channel information")
+  }
+
+  const handleViewChannel=()=>{
+    setIsActive("Videos")
+    setIsEditable(false)
   }
 
   useEffect(() => {
@@ -153,16 +152,20 @@ function Channel() {
               <div className="md:ml-auto w-full md:w-auto">
                 {
                   username === user.username ? (
+                    !isEditable ? 
                     <div className='flex justify-between gap-3'>
-
                       <button className="w-full md:w-auto flex justify-center items-center gap-2 bg-[#8B5CF6] hover:bg-[#7c3aed] text-black font-semibold px-6 py-2.5 rounded-full transition-colors duration-200 cursor-pointer" onClick={handleAddModal}>
                         <FontAwesomeIcon icon={faPlus} />
                         <span>Add Video</span>
                       </button>
-
-                      <button className="w-full md:w-auto flex justify-center items-center gap-2 bg-[#8B5CF6] hover:bg-[#7c3aed] text-black font-semibold px-6 py-2.5 rounded-full transition-colors duration-200 cursor-pointer">
+                      <button className="w-full md:w-auto flex justify-center items-center gap-2 bg-[#8B5CF6] hover:bg-[#7c3aed] text-black font-semibold px-6 py-2.5 rounded-full transition-colors duration-200 cursor-pointer" onClick={handleEdit}>
                         <FontAwesomeIcon icon={faEdit} />
                         <span>Edit</span>
+                      </button>
+                    </div>:
+                    <div className='flex justify-between gap-3'>
+                      <button className="w-full md:w-auto flex justify-center items-center gap-2 bg-[#8B5CF6] hover:bg-[#7c3aed] text-black font-semibold px-6 py-2.5 rounded-full transition-colors duration-200 cursor-pointer" onClick={handleViewChannel}>
+                        <span>View Channel</span>
                       </button>
                     </div>
                   ) :
@@ -183,6 +186,15 @@ function Channel() {
       <div className='p-3 mx-3 '>
         <ul className='flex justify-between mb-2 text-center text-gray-400 '>
           {
+            isEditable ? 
+            editTabs.map((tab) => (
+              <div key={tab}>
+                <button className='cursor-pointer' onClick={() => setIsActive(tab)}>
+                  <li className={`text-center shrink-0 px-32 py-2 ${isActive === tab ? "bg-slate-100 border-b-2" : ""}`}>{tab}</li>
+                </button>
+              </div>
+            ))
+             :
             tabs.map((tab) => (
               <div key={tab}>
                 <button className='cursor-pointer' onClick={() => setIsActive(tab)}>
@@ -195,7 +207,8 @@ function Channel() {
         <hr />
       </div>
       {
-        (() => {
+        (
+          () => {
           switch (isActive) {
             case "Videos":
               return <ChannelVideos videos={videos} />
@@ -203,6 +216,10 @@ function Channel() {
               return <ChannelPlaylist />
             case "Subscribers":
               return <ChannelSubscribers channel={channel} isSubscribed={isSubscribed} />
+            case "Channel information":
+              return <EditChannelInfo/>
+            case "Change Password":
+              return <ChangePassword/>
           }
         }
 

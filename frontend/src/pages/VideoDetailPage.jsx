@@ -26,7 +26,6 @@ function VideoDetailPage() {
     const [subscribers, setSubscribers] = useState(0)
     const [isSubscribed, setIsSubscribed] = useState(false);
 
-
     const commentHandler = async (e) => {
         e.preventDefault()
         try {
@@ -102,10 +101,10 @@ function VideoDetailPage() {
         try {
             const channelId = video.owner._id;
             const res = await api.post(`/subscriptions/toggleSubscription/${channelId}`)
-            if(res.status===201){
+            if (res.status === 201) {
                 setIsSubscribed(true)
             }
-            else{
+            else {
                 setIsSubscribed(false)
             }
         } catch (error) {
@@ -126,7 +125,7 @@ function VideoDetailPage() {
                 setSubscribers(subscribers?.data?.data?.length)
                 const channelsubscribed = subscribers?.data?.data
                 const subscribed = channelsubscribed.filter((subscribed) => (
-                    subscribed?.subscriber._id === user._id && channelId === subscribed?.channel
+                    subscribed?.subscriber._id === user?._id && channelId === subscribed?.channel
                 ))
                 if (subscribed?.length !== 0) {
                     setIsSubscribed(true)
@@ -188,11 +187,12 @@ function VideoDetailPage() {
 
         setTimeout(() => {
             setLoading(false)
-        }, 3000);
-    }, [id, isLiked,isSubscribed]);
+        }, 1000);
+    }, [id, isLiked, isSubscribed]);
     useEffect(() => {
         const suggestionVideos = async () => {
             try {
+                setLoading(true)
                 const videos = await api.get("/videos/getAllVideos")
                 const allvideos = videos.data.data
                 const otherVideos = allvideos.filter((v) => (
@@ -204,109 +204,116 @@ function VideoDetailPage() {
             }
         }
         suggestionVideos()
+        setTimeout(() => {
+            setLoading(false)
+        },1000);
     }, [video]);
     // useEffect(() => {
     //     console.log(video)
     //     console.log(url)
     // }, []);
 
-    if (loading) {
-        return (
-            <div className='p-4 flex items-center m-auto justify-center h-screen w-full'>
-                <div className='m-auto items-center'>
-                    <FadeLoader
-                        color="#f3faff"
-                        height={11}
-                        width={9}
-                        radius={3}
-                    />
-                    <p>Loading...</p>
-                </div>
-            </div>
-        )
-    }
-    else {
-        return (
-            <div className='p-4 flex gap-3'>
-                <div className=''>
-                    <video
-                        src={url}
-                        autoPlay
-                        loop
-                        muted
-                        playsInline
-                        controls={true}
-                        style={{
-                            width: "100%",
-                            height: "500px",
-                            objectFit: "cover",
-                            background: "#000"
-                        }}
-                    />
-                    <div className='border rounded-md my-4 p-3'>
-                        <div className='flex justify-between'>
-                            <div>
-                                <h2 className='text-lg'>{(video.title)?.replace(/^./, char => char.toUpperCase())}</h2>
-                                <span>{video.views} Views . </span><span>{formatTime(video.createdAt)}</span>
-                            </div>
-                            <div className='p-3'>
-                                <button className='py-2 px-4 border rounded-l-md hover:cursor-pointer' onClick={handleLike}><FontAwesomeIcon icon={isLiked ? solidThumbsUp : faThumbsUp} /><span>{likes}</span></button>
-                                <button className='py-2 px-4 border rounded-r-md hover:cursor-pointer' onClick={handleDislike}><FontAwesomeIcon icon={isDisLiked ? solidThumbsDown : faThumbsDown} /><span>{disLikes}</span></button>
-                                <button className='ms-5 border p-2 rounded-md hover:cursor-pointer'><FontAwesomeIcon icon={faFolderPlus} /><span className='px-1'>Save</span></button>
-                            </div>
+    return (
+        <div className='p-4 flex gap-3'>
+            {
+                loading ? (
+                    <div className='p-4 flex items-center m-auto justify-center h-screen w-full'>
+                        <div className='m-auto items-center'>
+                            <FadeLoader
+                                color="#f3faff"
+                                height={11}
+                                width={9}
+                                radius={3}
+                            />
+                            <p>Loading...</p>
                         </div>
-                        <div className='flex justify-between py-2'>
-                            <Link to={`/channel/${video.owner?.username}/Videos`}>
-                                <div className='flex'>
-                                    <img src={video?.owner?.avatar?.url} alt="avatar" className='rounded-full h-12 w-12 object-cover shadow-md mt-1' />
-                                    <div className='p-1 mx-2'>
-                                        <p className='text-lg'>{(video?.owner?.username)?.replace(/^./, char => char.toUpperCase())}</p>
-                                        <p className='text-sm text-slate-400'>{subscribers} {subscribers === 1 ? "Subscriber" : "Subscribers"}</p>
+                    </div>
+                )
+
+                    : (
+                        <>
+                            <div className='w-full'>
+                                <video
+                                    src={url}
+                                    autoPlay
+                                    loop
+                                    muted
+                                    playsInline
+                                    controls={true}
+                                    style={{
+                                        width: "100%",
+                                        height: "500px",
+                                        objectFit: "cover",
+                                        background: "#000"
+                                    }}
+                                />
+                                <div className='border rounded-md my-4 p-3'>
+                                    <div className='flex justify-between'>
+                                        <div>
+                                            <h2 className='text-lg'>{(video.title)?.replace(/^./, char => char.toUpperCase())}</h2>
+                                            <span>{video.views} Views . </span><span>{formatTime(video.createdAt)}</span>
+                                        </div>
+                                        <div className='p-3'>
+                                            <button className='py-2 px-4 border rounded-l-md hover:cursor-pointer' onClick={handleLike}><FontAwesomeIcon icon={isLiked ? solidThumbsUp : faThumbsUp} /><span>{likes}</span></button>
+                                            <button className='py-2 px-4 border rounded-r-md hover:cursor-pointer' onClick={handleDislike}><FontAwesomeIcon icon={isDisLiked ? solidThumbsDown : faThumbsDown} /><span>{disLikes}</span></button>
+                                            <button className='ms-5 border p-2 rounded-md hover:cursor-pointer'><FontAwesomeIcon icon={faFolderPlus} /><span className='px-1'>Save</span></button>
+                                        </div>
+                                    </div>
+                                    <div className='flex justify-between py-2'>
+                                        <Link to={`/channel/${video.owner?.username}/Videos`}>
+                                            <div className='flex'>
+                                                <img src={video?.owner?.avatar?.url} alt="avatar" className='rounded-full h-12 w-12 object-cover shadow-md mt-1' />
+                                                <div className='p-1 mx-2'>
+                                                    <p className='text-lg'>{(video?.owner?.username)?.replace(/^./, char => char.toUpperCase())}</p>
+                                                    <p className='text-sm text-slate-400'>{subscribers} {subscribers === 1 ? "Subscriber" : "Subscribers"}</p>
+                                                </div>
+                                            </div>
+                                        </Link>
+                                        {video?.owner?.username !== user?.username &&
+                                            <div className='p-4'>
+                                                <button className='w-full md:w-auto flex justify-center items-center gap-2 bg-[#8B5CF6] hover:bg-[#7c3aed] text-black font-semibold px-4 py-2.5 rounded-full transition-colors duration-200 cursor-pointer' onClick={handleSubscription}><FontAwesomeIcon icon={isSubscribed ? faUserXmark : faUserPlus} className='mx-1' /> {isSubscribed ? "Unsubscribe" : "Subscribe"}</button>
+                                            </div>
+                                        }
+                                    </div>
+                                    <hr />
+                                    <div className='p-1'>
+                                        <p className='text-sm py-2'>
+                                            {video.description}
+                                        </p>
                                     </div>
                                 </div>
-                            </Link>
-                            {video?.owner?.username !== user?.username &&
-                                <div className='p-4'>
-                                    <button className='w-full md:w-auto flex justify-center items-center gap-2 bg-[#8B5CF6] hover:bg-[#7c3aed] text-black font-semibold px-4 py-2.5 rounded-full transition-colors duration-200 cursor-pointer' onClick={handleSubscription}><FontAwesomeIcon icon={isSubscribed ? faUserXmark : faUserPlus} className='mx-1' /> {isSubscribed ? "Unsubscribe" : "Subscribe"}</button>
-                                </div>
-                            }
-                        </div>
-                        <hr />
-                        <div className='p-1'>
-                            <p className='text-sm py-2'>
-                                {video.description}
-                            </p>
-                        </div>
-                    </div>
-                    <div className='border rounded-md p-3 my-4 w-full'>
-                        <p>{comments.length} {comments.length === 1 ? "Comment" : "Comments"}</p>
-                        <form onSubmit={commentHandler} className='mb-2'>
-                            <input type="text" placeholder='Add a Comment' className='border rounded-md px-2 py-1 my-2 w-full text-white' value={content} onChange={(e) => setContent(e.target.value)} />
-                            <button type='submit'></button>
-                        </form>
-                        <hr />
-                        {
-                            comments.map((comment) => (
-                                <div key={comment._id} className='my-1'>
-                                    <CommentView comment={comment} onDelete={removeComment} onUpdate={updateComment} />
+                                <div className='border rounded-md p-3 my-4 w-full'>
+                                    <p>{comments.length} {comments.length === 1 ? "Comment" : "Comments"}</p>
+                                    <form onSubmit={commentHandler} className='mb-2'>
+                                        <input type="text" placeholder='Add a Comment' className='border rounded-md px-2 py-1 my-2 w-full text-white' value={content} onChange={(e) => setContent(e.target.value)} />
+                                        <button type='submit'></button>
+                                    </form>
                                     <hr />
+                                    {
+                                        comments.map((comment) => (
+                                            <div key={comment._id} className='my-1'>
+                                                <CommentView comment={comment} onDelete={removeComment} onUpdate={updateComment} />
+                                                <hr />
+                                            </div>
+                                        ))
+                                    }
                                 </div>
-                            ))
-                        }
-                    </div>
-                </div>
-                <div>
-                    {
-                        suggestions.map((suggestion) => (
-                            <div key={suggestion._id}>
-                                <VideoSuggestionView video={suggestion} />
                             </div>
-                        ))
-                    }
-                </div>
-            </div>
-        )
-    }
+                            <div>
+                                {
+                                    suggestions.map((suggestion) => (
+                                        <div key={suggestion._id}>
+                                            <VideoSuggestionView video={suggestion} />
+                                        </div>
+                                    ))
+                                }
+                            </div>
+                        </>
+                    )
+            }
+        </div>
+    )
+
 }
 
 export default VideoDetailPage

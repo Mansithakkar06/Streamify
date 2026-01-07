@@ -24,8 +24,19 @@ export const userSlice = createSlice({
             state.isLoggedin = false
             localStorage.removeItem("user")
         },
+        updateUserData:(state,action)=>{
+            state.userData={...state.userData,...action.payload}
+            const localuser=JSON.parse(localStorage.getItem("user"))
+            if(localuser){
+                const updateduser={
+                    ...localuser,
+                    ...action.payload
+                }
+                localStorage.setItem("user",JSON.stringify(updateduser))
+            }
+        }
     }
 })
 
-export const { signup, login, logout } = userSlice.actions
+export const { signup, login, logout,updateUserData } = userSlice.actions
 export default userSlice.reducer
