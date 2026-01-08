@@ -12,6 +12,7 @@ import Login from './pages/Login'
 import Register from './pages/Register'
 import Channel from './pages/Channel'
 import Settings from './pages/Settings'
+import Dashboard from './pages/Dashboard'
 
 function App() {
 
@@ -21,6 +22,7 @@ function App() {
         <Routes>
           <Route path='/login' Component={Login}/>
           <Route path='/signup' Component={Register}/>
+          <Route path='/dashboard' Component={Dashboard}/>
           <Route path='/' Component={Layout}>
             <Route path='/' Component={Home} />
             <Route path='/search' Component={VideoListPage} />

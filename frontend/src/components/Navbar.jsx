@@ -2,7 +2,7 @@ import { faSearch } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import React, { useEffect, useState } from 'react'
 import logo from '../assets/images/logo.jpg'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { api } from '../api/api'
 import { useDispatch, useSelector } from 'react-redux'
 import { logout } from '../slices/UserSlice'
@@ -12,22 +12,24 @@ function Navbar() {
     const isLoggedin = useSelector(state => state.user.isLoggedin)
     const [search, setSearch] = useState("")
     const navigate = useNavigate()
-    const dispatch=useDispatch()
+    const dispatch = useDispatch()
+    const location = useLocation()
+
     const handleSearch = (e) => {
         e.preventDefault();
         if (!search.trim()) return;
         navigate(`search?query=${encodeURIComponent(search)}`, { replace: true })
     }
-    const logoutHandler=async(e)=>{
+    const logoutHandler = async (e) => {
         e.preventDefault();
         try {
-            const res=await api.post('/users/logout');
-            if(res.status===200){
+            const res = await api.post('/users/logout');
+            if (res.status === 200) {
                 dispatch(logout())
                 navigate("/")
             }
         } catch (error) {
-            console.log("error in logout",error)
+            console.log("error in logout", error)
         }
     }
 
@@ -45,9 +47,14 @@ function Navbar() {
             {
                 isLoggedin ? (
                     <div className='flex justify-between p-2'>
-                        <form onSubmit={logoutHandler} className='p-1'>
-                            <button className='mx-3 hover:cursor-pointer hover:text-gray-400 hover:bg-gray-600'>Logout</button>
-                        </form>
+                        {
+                            location.pathname !== "/dashboard" && (
+                                <form onSubmit={logoutHandler} className='p-1'>
+                                    <button className='mx-3 hover:cursor-pointer hover:text-gray-400 hover:bg-gray-600'>Logout</button>
+                                </form>
+                            )
+
+                        }
                         <Link to={`/channel/${user.username}/Videos`} className='mx-3 hover:cursor-pointer hover:text-gray-400 hover:bg-gray-600'>
                             <img src={user.avatar.url} alt="avatar" className='rounded-full h-10 w-10 object-cover shadow-md' />
                         </Link>

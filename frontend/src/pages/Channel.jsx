@@ -1,11 +1,11 @@
 import React from 'react'
 import { useState } from 'react';
 import { useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import { api } from '../api/api';
 import { FadeLoader } from 'react-spinners';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlayCircle, faPlus, faUserPlus, faUserXmark } from '@fortawesome/free-solid-svg-icons';
+import { faDashboard, faPlayCircle, faPlus, faUserPlus, faUserXmark } from '@fortawesome/free-solid-svg-icons';
 import VideoCardView from '../components/VideoCardView';
 import ChannelVideos from './ChannelVideos';
 import Playlist from './ChannelPlaylist';
@@ -28,7 +28,7 @@ function Channel() {
   const [videos, setVideos] = useState([])
   const [isSubscribed, setIsSubscribed] = useState(false)
   const tabs = ["Videos", "Playlist", "Subscribers"]
-  const editTabs=["Channel information","Change Password"]
+  const editTabs = ["Channel information", "Change Password"]
   const [isEditable, setIsEditable] = useState(false);
   const [modalType, setModalType] = useState(null);
   const navigate = useNavigate()
@@ -53,18 +53,18 @@ function Channel() {
   const handleUploading = () => setModalType("uploading")
   const closeModal = () => setModalType(null)
   const handleUploaded = () => setModalType("uploaded")
-  
+
   const handleAfterUploaded = () => {
     closeModal()
     navigate(0)
   }
 
-  const handleEdit=()=>{
+  const handleEdit = () => {
     setIsEditable(true)
     setIsActive("Channel information")
   }
 
-  const handleViewChannel=()=>{
+  const handleViewChannel = () => {
     setIsActive("Videos")
     setIsEditable(false)
   }
@@ -152,22 +152,26 @@ function Channel() {
               <div className="md:ml-auto w-full md:w-auto">
                 {
                   username === user.username ? (
-                    !isEditable ? 
-                    <div className='flex justify-between gap-3'>
-                      <button className="w-full md:w-auto flex justify-center items-center gap-2 bg-[#8B5CF6] hover:bg-[#7c3aed] text-black font-semibold px-6 py-2.5 rounded-full transition-colors duration-200 cursor-pointer" onClick={handleAddModal}>
-                        <FontAwesomeIcon icon={faPlus} />
-                        <span>Add Video</span>
-                      </button>
-                      <button className="w-full md:w-auto flex justify-center items-center gap-2 bg-[#8B5CF6] hover:bg-[#7c3aed] text-black font-semibold px-6 py-2.5 rounded-full transition-colors duration-200 cursor-pointer" onClick={handleEdit}>
-                        <FontAwesomeIcon icon={faEdit} />
-                        <span>Edit</span>
-                      </button>
-                    </div>:
-                    <div className='flex justify-between gap-3'>
-                      <button className="w-full md:w-auto flex justify-center items-center gap-2 bg-[#8B5CF6] hover:bg-[#7c3aed] text-black font-semibold px-6 py-2.5 rounded-full transition-colors duration-200 cursor-pointer" onClick={handleViewChannel}>
-                        <span>View Channel</span>
-                      </button>
-                    </div>
+                    !isEditable ?
+                      <div className='flex justify-between gap-3'>
+                        <button className="w-full md:w-auto flex justify-center items-center gap-2 bg-[#8B5CF6] hover:bg-[#7c3aed] text-black font-semibold px-4 py-2.5 rounded-full transition-colors duration-200 cursor-pointer" onClick={handleAddModal}>
+                          <FontAwesomeIcon icon={faPlus} />
+                          <span>Add Video</span>
+                        </button>
+                        <button className="w-full md:w-auto flex justify-center items-center gap-2 bg-[#8B5CF6] hover:bg-[#7c3aed] text-black font-semibold px-4 py-2.5 rounded-full transition-colors duration-200 cursor-pointer" onClick={handleEdit}>
+                          <FontAwesomeIcon icon={faEdit} />
+                          <span>Edit</span>
+                        </button>
+                        <Link to="/dashboard" className="w-full md:w-auto flex justify-center items-center gap-2 bg-[#8B5CF6] hover:bg-[#7c3aed] text-black font-semibold px-4 py-2.5 rounded-full transition-colors duration-200 cursor-pointer" onClick={handleEdit}>
+                          <FontAwesomeIcon icon={faDashboard} />
+                          <span>Dashboard</span>
+                        </Link>
+                      </div> :
+                      <div className='flex justify-between gap-3'>
+                        <button className="w-full md:w-auto flex justify-center items-center gap-2 bg-[#8B5CF6] hover:bg-[#7c3aed] text-black font-semibold px-6 py-2.5 rounded-full transition-colors duration-200 cursor-pointer" onClick={handleViewChannel}>
+                          <span>View Channel</span>
+                        </button>
+                      </div>
                   ) :
                     (
                       <button className="w-full md:w-auto flex justify-center items-center gap-2 bg-[#8B5CF6] hover:bg-[#7c3aed] text-black font-semibold px-6 py-2.5 rounded-full transition-colors duration-200 cursor-pointer" onClick={handleSubscription}>
@@ -186,22 +190,22 @@ function Channel() {
       <div className='p-3 mx-3 '>
         <ul className='flex justify-between mb-2 text-center text-gray-400 '>
           {
-            isEditable ? 
-            editTabs.map((tab) => (
-              <div key={tab}>
-                <button className='cursor-pointer' onClick={() => setIsActive(tab)}>
-                  <li className={`text-center shrink-0 px-32 py-2 ${isActive === tab ? "bg-slate-100 border-b-2" : ""}`}>{tab}</li>
-                </button>
-              </div>
-            ))
-             :
-            tabs.map((tab) => (
-              <div key={tab}>
-                <button className='cursor-pointer' onClick={() => setIsActive(tab)}>
-                  <li className={`text-center shrink-0 px-32 py-2 ${isActive === tab ? "bg-slate-100 border-b-2" : ""}`}>{tab}</li>
-                </button>
-              </div>
-            ))
+            isEditable ?
+              editTabs.map((tab) => (
+                <div key={tab}>
+                  <button className='cursor-pointer' onClick={() => setIsActive(tab)}>
+                    <li className={`text-center shrink-0 px-32 py-2 ${isActive === tab ? "bg-slate-100 border-b-2" : ""}`}>{tab}</li>
+                  </button>
+                </div>
+              ))
+              :
+              tabs.map((tab) => (
+                <div key={tab}>
+                  <button className='cursor-pointer' onClick={() => setIsActive(tab)}>
+                    <li className={`text-center shrink-0 px-32 py-2 ${isActive === tab ? "bg-slate-100 border-b-2" : ""}`}>{tab}</li>
+                  </button>
+                </div>
+              ))
           }
         </ul>
         <hr />
@@ -209,23 +213,23 @@ function Channel() {
       {
         (
           () => {
-          switch (isActive) {
-            case "Videos":
-              return <ChannelVideos videos={videos} />
-            case "Playlist":
-              return <ChannelPlaylist />
-            case "Subscribers":
-              return <ChannelSubscribers channel={channel} isSubscribed={isSubscribed} />
-            case "Channel information":
-              return <EditChannelInfo/>
-            case "Change Password":
-              return <ChangePassword/>
+            switch (isActive) {
+              case "Videos":
+                return <ChannelVideos videos={videos} />
+              case "Playlist":
+                return <ChannelPlaylist />
+              case "Subscribers":
+                return <ChannelSubscribers channel={channel} isSubscribed={isSubscribed} />
+              case "Channel information":
+                return <EditChannelInfo />
+              case "Change Password":
+                return <ChangePassword />
+            }
           }
-        }
 
         )()
       }
-      <Modal isOpen={modalType !== null} onClose={closeModal} title={modalType === "add" ? "Upload Video" : modalType==="edit"? "Edit Video":""}>
+      <Modal isOpen={modalType !== null} onClose={closeModal} title={modalType === "add" ? "Upload Video" : modalType === "edit" ? "Edit Video" : ""}>
         {modalType === 'add' && <AddVideo onUploading={handleUploading} onUploaded={handleUploaded} />}
         {modalType === "uploading" && <Uploading />}
         {modalType === "uploaded" && <Uploaded onclose={handleAfterUploaded} />}
