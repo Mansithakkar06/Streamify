@@ -36,7 +36,7 @@ function Navbar() {
     return (
         <div className='p-2 border-b border-b-white position-sticky top-0 flex justify-between'>
             <div>
-                <img src={logo} alt="logo" height={50} width={170} />
+               <Link to='/'> <img src={logo} alt="logo" height={50} width={170} /></Link>
             </div>
             <div className='p-2'>
                 <form onSubmit={handleSearch} className='border'>

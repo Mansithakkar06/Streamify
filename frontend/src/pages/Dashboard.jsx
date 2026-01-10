@@ -6,13 +6,28 @@ import { faEdit, faPencil, faPlus, faTrash } from '@fortawesome/free-solid-svg-i
 import { faEye, faHeart, faUser } from '@fortawesome/free-regular-svg-icons'
 import { api } from '../api/api'
 import Switch from 'react-switch'
+import Modal from '../components/Modal'
+import DeleteVideo from './DeleteVideo'
 
 function Dashboard() {
     const user = useSelector(state => state.user.userData)
     const [dashboardData, setDashboardData] = useState(null);
     const [videos, setVideos] = useState(null);
+    const [isOpen, setIsOpen] = useState(false);
+    const [id, setId] = useState("");
+    const handleChange = async (id) => {
+        try {
+            await api.patch(`/videos/togglePublish/${id}`);
+        } catch (error) {
+            console.log("error in toggle publish", error)
+        }
+    }
     const handleAddModal = () => {
 
+    }
+    const handleDelete = (id) => {
+        setIsOpen(true)
+        setId(id)
     }
     useEffect(() => {
         const fetchdashboardData = async () => {
@@ -24,17 +39,17 @@ function Dashboard() {
             }
         }
         fetchdashboardData()
-        const fetchVideos=async()=>{
+        const fetchVideos = async () => {
             try {
-                const res=await api.get('/dashboard/getChannelVideos')
+                const res = await api.get('/dashboard/getChannelVideos')
                 setVideos(res.data.data)
             } catch (error) {
-                console.log("error in fetching videos!!",error)
+                console.log("error in fetching videos!!", error)
             }
         }
         fetchVideos()
-    }, []);
-    
+    }, [videos]);
+
     return (
         <div>
             <Navbar />
@@ -83,35 +98,37 @@ function Dashboard() {
                     </thead>
                     <tbody>
                         {
-                            videos?.map((video)=>(
+                            videos?.map((video) => (
                                 <tr key={video?._id} className='border border-b-[#ad8bfb]'>
                                     <td className='py-3 px-4'>
-                                       <Switch checked={video?.isPublished}/> 
+                                        <Switch checked={video?.isPublished} onChange={() => handleChange(video._id)} />
                                     </td>
-                                    <td className='py-3 px-4'><p className={`border ${video?.isPublished?"border-green-500 text-green-500":"border-orange-500 text-orange-500"}  font-semibold w-fit py-1 px-3 rounded-2xl`}>{video?.isPublished?"Published":"Unpublished"}</p></td>
+                                    <td className='py-3 px-4'><p className={`border ${video?.isPublished ? "border-green-500 text-green-500" : "border-orange-500 text-orange-500"}  font-semibold w-fit py-1 px-3 rounded-2xl`}>{video?.isPublished ? "Published" : "Unpublished"}</p></td>
                                     <td className='py-3 px-4 flex gap-2'>
                                         <img src={video.owner.avatar.url} alt="avatar" className='rounded-full h-10 w-10 object-cover shadow-md' />
                                         <p className='p-2 font-semibold'>{video?.title}</p></td>
                                     <td className='py-3 px-4'>
-                                       <div className='flex gap-2 justify-center'>
-                                         <p className='text-green-800 bg-green-100 px-3 py-1 rounded-xl font-semibold'>{video.likesCount} {video.likesCount===1?"like":"likes"}</p>
-                                        <p className='text-red-800 bg-red-100 px-3 py-1 rounded-xl font-semibold'>{video.dislikesCount} {video.dislikesCount===1?"like":"likes"}</p>
-                                       </div>
+                                        <div className='flex gap-2 justify-center'>
+                                            <p className='text-green-800 bg-green-100 px-3 py-1 rounded-xl font-semibold'>{video.likesCount} {video.likesCount === 1 ? "like" : "likes"}</p>
+                                            <p className='text-red-800 bg-red-100 px-3 py-1 rounded-xl font-semibold'>{video.dislikesCount} {video.dislikesCount === 1 ? "like" : "likes"}</p>
+                                        </div>
                                     </td>
-                                    <td className='py-3 px-4 text-center'>{video?.createdAt.slice(0,10)}</td>
+                                    <td className='py-3 px-4 text-center'>{video?.createdAt.slice(0, 10)}</td>
                                     <td className='py-3 px-4'>
                                         <div className='flex gap-3 justify-center'>
-                                            <FontAwesomeIcon icon={faEdit} className='text-lg'/>
-                                            <FontAwesomeIcon icon={faTrash} className='text-lg'/>
-                                            </div>
-                                            </td>     
+                                             <button className='hover:cursor-pointer'><FontAwesomeIcon icon={faEdit} className='text-lg' /></button>
+                                            <button className='hover:cursor-pointer'><FontAwesomeIcon icon={faTrash} className='text-lg' onClick={() => handleDelete(video._id)} /></button>
+                                        </div>
+                                    </td>
                                 </tr>
                             ))
                         }
                     </tbody>
                 </table>
             </div>
-
+            <Modal isOpen={isOpen} onClose={()=>setIsOpen(false)}>
+                    <DeleteVideo id={id} onClose={()=>setIsOpen(false)} videos={videos} setVideos={setVideos} />
+            </Modal>
         </div>
     )
 }

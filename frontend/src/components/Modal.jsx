@@ -2,7 +2,7 @@ import { faXmark } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import React from 'react'
 
-function Modal({ isOpen, onClose, title, children }) {
+function Modal({ isOpen, onClose, title="", children }) {
   if (!isOpen) return null
   return (
     <div className='fixed inset-0 z-50 flex items-center justify-center' onClick={onClose}>
