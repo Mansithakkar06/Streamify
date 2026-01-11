@@ -46,7 +46,6 @@ function Channel() {
     } catch (error) {
       console.log("error in subscription", error)
     }
-
   }
 
   const handleAddModal = () => setModalType("add")

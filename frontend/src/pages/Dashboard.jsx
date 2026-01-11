@@ -8,13 +8,20 @@ import { api } from '../api/api'
 import Switch from 'react-switch'
 import Modal from '../components/Modal'
 import DeleteVideo from './DeleteVideo'
+import { useNavigate } from 'react-router-dom'
+import AddVideo from './AddVideo'
+import Uploading from './Uploading'
+import Uploaded from './Uploaded'
+import EditVideo from './EditVideo'
 
 function Dashboard() {
     const user = useSelector(state => state.user.userData)
     const [dashboardData, setDashboardData] = useState(null);
     const [videos, setVideos] = useState(null);
-    const [isOpen, setIsOpen] = useState(false);
-    const [id, setId] = useState("");
+    const [id, setId] = useState(null);
+    const [modalType, setModalType] = useState(null);
+    const navigate = useNavigate()
+
     const handleChange = async (id) => {
         try {
             await api.patch(`/videos/togglePublish/${id}`);
@@ -22,13 +29,25 @@ function Dashboard() {
             console.log("error in toggle publish", error)
         }
     }
-    const handleAddModal = () => {
 
+    const handleAddModal = () => setModalType("add")
+    const handleUploading = () => setModalType("uploading")
+    const closeModal = () => setModalType(null)
+    const handleUploaded = () => setModalType("uploaded")
+
+    const handleAfterUploaded = () => {
+        closeModal()
+        navigate(0)
     }
     const handleDelete = (id) => {
-        setIsOpen(true)
+        setModalType("delete")
         setId(id)
     }
+    const handleEdit=(id)=>{
+        setModalType("edit")
+        setId(id)
+    }
+
     useEffect(() => {
         const fetchdashboardData = async () => {
             try {
@@ -105,7 +124,7 @@ function Dashboard() {
                                     </td>
                                     <td className='py-3 px-4'><p className={`border ${video?.isPublished ? "border-green-500 text-green-500" : "border-orange-500 text-orange-500"}  font-semibold w-fit py-1 px-3 rounded-2xl`}>{video?.isPublished ? "Published" : "Unpublished"}</p></td>
                                     <td className='py-3 px-4 flex gap-2'>
-                                        <img src={video.owner.avatar.url} alt="avatar" className='rounded-full h-10 w-10 object-cover shadow-md' />
+                                        <img src={video.thumbnail.url} alt="avatar" className='rounded-full h-10 w-10 object-cover shadow-md' />
                                         <p className='p-2 font-semibold'>{video?.title}</p></td>
                                     <td className='py-3 px-4'>
                                         <div className='flex gap-2 justify-center'>
@@ -116,7 +135,7 @@ function Dashboard() {
                                     <td className='py-3 px-4 text-center'>{video?.createdAt.slice(0, 10)}</td>
                                     <td className='py-3 px-4'>
                                         <div className='flex gap-3 justify-center'>
-                                             <button className='hover:cursor-pointer'><FontAwesomeIcon icon={faEdit} className='text-lg' /></button>
+                                            <button className='hover:cursor-pointer' onClick={()=>handleEdit(video._id)}><FontAwesomeIcon icon={faEdit} className='text-lg' /></button>
                                             <button className='hover:cursor-pointer'><FontAwesomeIcon icon={faTrash} className='text-lg' onClick={() => handleDelete(video._id)} /></button>
                                         </div>
                                     </td>
@@ -126,8 +145,12 @@ function Dashboard() {
                     </tbody>
                 </table>
             </div>
-            <Modal isOpen={isOpen} onClose={()=>setIsOpen(false)}>
-                    <DeleteVideo id={id} onClose={()=>setIsOpen(false)} videos={videos} setVideos={setVideos} />
+            <Modal isOpen={modalType !== null} onClose={closeModal} title={modalType === "add" ? "Upload Video" : modalType === "edit" ? "Edit Video" : ""}>
+                {modalType === 'add' && <AddVideo onUploading={handleUploading} onUploaded={handleUploaded} />}
+                {modalType === "uploading" && <Uploading />}
+                {modalType === "uploaded" && <Uploaded onclose={handleAfterUploaded} />}
+                {modalType === "delete" && <DeleteVideo id={id} onClose={closeModal} videos={videos} setVideos={setVideos} />}
+                {modalType === 'edit' && <EditVideo onUploading={handleUploading} onUploaded={handleUploaded} id={id} />}
             </Modal>
         </div>
     )
