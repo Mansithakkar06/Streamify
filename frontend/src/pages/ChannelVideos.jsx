@@ -6,8 +6,8 @@ import { useParams } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 
 function ChannelVideos({ videos }) {
-    const { username } = useParams();
-    const user = useSelector(state => state.user.userData)
+    // const { username } = useParams();
+    // const user = useSelector(state => state.user.userData)
     return (
         <div>
             {

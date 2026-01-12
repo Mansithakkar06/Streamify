@@ -5,7 +5,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom'
 import { api } from '../api/api';
 import { FadeLoader } from 'react-spinners';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faDashboard, faPlayCircle, faPlus, faUserPlus, faUserXmark } from '@fortawesome/free-solid-svg-icons';
+import { faCloudUpload, faDashboard, faPlayCircle, faPlus, faUserPlus, faUserXmark } from '@fortawesome/free-solid-svg-icons';
 import VideoCardView from '../components/VideoCardView';
 import ChannelVideos from './ChannelVideos';
 import Playlist from './ChannelPlaylist';
@@ -68,6 +68,20 @@ function Channel() {
     setIsEditable(false)
   }
 
+  const handleUpdateAvatar = async (e) => {
+    try {
+      // const res = await api.patch("/users/updateAvtar")
+      console.log(e.target.files)
+
+    } catch (error) {
+      console.log("error in update avatar", error)
+    }
+  }
+
+  const handleUpdateCoverImage = () => {
+
+  }
+
   useEffect(() => {
     setIsActive(activeTab)
   }, [activeTab]);
@@ -121,6 +135,18 @@ function Channel() {
             alt="cover image"
             className="w-full h-full object-cover"
           />
+          {isEditable && <label htmlFor='coverImage' className=' absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2
+          bg-black/10 text-white p-2 rounded-lg cursor-pointer hover:bg-black/20 transition'>
+            <FontAwesomeIcon icon={faCloudUpload} className='text-[#8B5CF6] text-xl' />
+          </label>
+          }
+           <input
+        type="file"
+        id="coverImage"
+        hidden
+        accept="image/*"
+        onChange={handleUpdateCoverImage}
+      />
         </div>
 
         <div className="px-4 md:px-12 pb-4">
@@ -131,6 +157,17 @@ function Channel() {
                 alt="Profile"
                 className="w-24 h-24 md:w-32 md:h-32 rounded-full object-cover border-3 shadow-lg"
               />
+              {isEditable && <label htmlFor='avatar' className=' absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-black/10 text-white p-2 rounded-lg cursor-pointer
+          hover:bg-black/20 transition'>
+                <FontAwesomeIcon icon={faCloudUpload} className='text-[#8B5CF6] text-xl' />
+              </label>}
+                <input
+                  type="file"
+                  id="avatar"
+                  hidden
+                  accept="image/*"
+                  onChange={handleUpdateAvatar}
+                />
             </div>
 
             <div className="grow flex flex-col md:flex-row justify-between items-start md:items-center w-full gap-4 md:gap-0 md:pt-4">
