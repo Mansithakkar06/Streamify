@@ -32,6 +32,7 @@ function Channel() {
   const [isEditable, setIsEditable] = useState(false);
   const [modalType, setModalType] = useState(null);
   const navigate = useNavigate()
+  const [loading, setLoading] = useState(false);
 
   const handleSubscription = async () => {
     try {
@@ -70,16 +71,34 @@ function Channel() {
 
   const handleUpdateAvatar = async (e) => {
     try {
-      // const res = await api.patch("/users/updateAvtar")
-      console.log(e.target.files)
+      const formdata = new FormData();
+      formdata.append("avatar", e.target.files[0])
+      setLoading(true)
+      const res = await api.patch("/users/updateAvtar", formdata)
+      if (res.status === 200) {
+        setLoading(false)
+        navigate(0)
+      }
 
     } catch (error) {
       console.log("error in update avatar", error)
     }
   }
 
-  const handleUpdateCoverImage = () => {
+  const handleUpdateCoverImage = async (e) => {
+    try {
+      const formdata = new FormData();
+      formdata.append("coverImage", e.target.files[0])
+      setLoading(true)
+      const res = await api.patch("/users/updateCoverImage", formdata)
+      if (res.status === 200) {
+        setLoading(false)
+        navigate(0)
+      }
 
+    } catch (error) {
+      console.log("error in update avatar", error)
+    }
   }
 
   useEffect(() => {
@@ -111,7 +130,7 @@ function Channel() {
     fetchVideos()
 
   }, [channel]);
-  if (!channel) {
+  if (!channel || loading) {
     return (
       <div className='p-4 flex items-center m-auto justify-center h-screen w-full'>
         <div className='m-auto items-center'>
@@ -140,13 +159,13 @@ function Channel() {
             <FontAwesomeIcon icon={faCloudUpload} className='text-[#8B5CF6] text-xl' />
           </label>
           }
-           <input
-        type="file"
-        id="coverImage"
-        hidden
-        accept="image/*"
-        onChange={handleUpdateCoverImage}
-      />
+          <input
+            type="file"
+            id="coverImage"
+            hidden
+            accept="image/*"
+            onChange={handleUpdateCoverImage}
+          />
         </div>
 
         <div className="px-4 md:px-12 pb-4">
@@ -161,13 +180,13 @@ function Channel() {
           hover:bg-black/20 transition'>
                 <FontAwesomeIcon icon={faCloudUpload} className='text-[#8B5CF6] text-xl' />
               </label>}
-                <input
-                  type="file"
-                  id="avatar"
-                  hidden
-                  accept="image/*"
-                  onChange={handleUpdateAvatar}
-                />
+              <input
+                type="file"
+                id="avatar"
+                hidden
+                accept="image/*"
+                onChange={handleUpdateAvatar}
+              />
             </div>
 
             <div className="grow flex flex-col md:flex-row justify-between items-start md:items-center w-full gap-4 md:gap-0 md:pt-4">

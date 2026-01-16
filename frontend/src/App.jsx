@@ -13,6 +13,9 @@ import Register from './pages/Register'
 import Channel from './pages/Channel'
 import Settings from './pages/Settings'
 import Dashboard from './pages/Dashboard'
+import History from './pages/History'
+import LikedVideos from './pages/LikedVideos'
+import ProtectedRoute from './components/ProtectedRoute'
 
 function App() {
 
@@ -20,15 +23,32 @@ function App() {
     <>
       <BrowserRouter>
         <Routes>
-          <Route path='/login' Component={Login}/>
-          <Route path='/signup' Component={Register}/>
-          <Route path='/dashboard' Component={Dashboard}/>
-          <Route path='/' Component={Layout}>
-            <Route path='/' Component={Home} />
-            <Route path='/search' Component={VideoListPage} />
-            <Route path='/videoDetail/:id' Component={VideoDetailPage} />
-            <Route path='/channel/:username/:activeTab' Component={Channel} />
-            <Route path='/settings' Component={Settings} />
+          <Route path='/login' element={<Login/>}/>
+          <Route path='/signup' element={<Register/>}/>
+          <Route path='/dashboard' element={
+            <ProtectedRoute>
+              <Dashboard/>
+            </ProtectedRoute>}/>
+          <Route path='/' element={<Layout/>}>
+            <Route path='/' element={<Home/>} />
+            <Route path='/search' element={<VideoListPage/>} />
+            <Route path='/videoDetail/:id' element={<VideoDetailPage/>} />
+            <Route path='/channel/:username/:activeTab' element={
+              <ProtectedRoute>
+                <Channel/>
+              </ProtectedRoute>
+            } />
+            <Route path='/settings' element={<Settings/>} />
+            <Route path='/history' element={
+              <ProtectedRoute>
+                <History/>
+              </ProtectedRoute>
+            } />
+            <Route path='/likedVideos' element={
+              <ProtectedRoute>
+                <LikedVideos/>
+              </ProtectedRoute>
+            } />
           </Route>
         </Routes>
       </BrowserRouter>
