@@ -9,7 +9,7 @@ import mongoose from "mongoose";
 const options = {
     httpOnly: true,
     secure: false,
-    // sameSite: 'Lax'
+    sameSite: 'none'
 }
 
 const generateTokens = async (userId) => {
