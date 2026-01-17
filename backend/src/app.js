@@ -3,9 +3,18 @@ import cors from 'cors'
 import cookieParser from 'cookie-parser'
 
 const app=express()
+const allowedOrigins = process.env.CORS_ORIGIN.split(",");
 
 app.use(cors({
-    origin:process.env.CORS_ORIGIN,//allows requests from this origin
+   origin: (origin, callback) => {//allows requests from this origin
+    if (!origin) return callback(null, true);
+
+    if (allowedOrigins.includes(origin)) {
+      callback(null, origin);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
     credentials:true, //allow cookies and jwt token to be sent
     methods: "GET,POST,PUT,PATCH,DELETE",
 }))
