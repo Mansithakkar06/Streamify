@@ -5,7 +5,7 @@ import logo from '../assets/images/logo.jpg'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { api } from '../api/api'
 import { useDispatch, useSelector } from 'react-redux'
-import { logout } from '../slices/UserSlice'
+import { logout } from '../slices/userSlice.js'
 
 function Navbar() {
     const user = useSelector(state => state.user.userData)
