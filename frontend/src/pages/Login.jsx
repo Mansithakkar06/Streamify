@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form'
 import { api } from '../api/api'
 import { Link, useNavigate } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
-import { login } from '../slices/UserSlice'
+import { login } from '../slices/userSlice.js'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faArrowLeft } from '@fortawesome/free-solid-svg-icons'
 
