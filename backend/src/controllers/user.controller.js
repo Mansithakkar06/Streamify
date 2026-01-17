@@ -6,10 +6,12 @@ import { ApiResponse } from '../utils/ApiResponse.js'
 import jwt from "jsonwebtoken"
 import mongoose from "mongoose";
 
+const isProduction = process.env.NODE_ENV === "production";
+
 const options = {
     httpOnly: true,
-    secure: false,
-    sameSite: 'none'
+    secure: isProduction,
+    sameSite: isProduction ? "None" : "Lax",
 }
 
 const generateTokens = async (userId) => {
@@ -82,7 +84,7 @@ const registerUser = asyncHandler(async (req, res, next) => {
         if (!createdUser) {
             throw new ApiError(500, "something went wrong in user registration!!")
         }
-         //generate tokens
+        //generate tokens
         const { accsessToken, refreshToken } = await generateTokens(user._id)
         return res.status(201)
             .cookie("refreshToken", refreshToken, options)
@@ -208,7 +210,7 @@ const changeCurrentPassword = asyncHandler(async (req, res) => {
     const { oldPassword, newPassword } = req.body;
     // console.log(req.user)
     const user = await User.findById(req.user?._id)
-    const isPasswordCorrect =await user.isPasswordCorrect(oldPassword);
+    const isPasswordCorrect = await user.isPasswordCorrect(oldPassword);
     if (!isPasswordCorrect) {
         throw new ApiError(400, "Invalid old Password")
     }
