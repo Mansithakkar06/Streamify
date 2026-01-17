@@ -136,7 +136,21 @@ function VideoDetailPage() {
             }
         }
         fetchVideo()
-        const fetchVideoLikes = async () => {
+        const fetchComments = async () => {
+            try {
+                const comments = await api.get(`/comments/getVideoComments/${id}`)
+                setComments(comments.data.data)
+            } catch (error) {
+                console.log("error in fetching comments", error)
+            }
+        }
+        fetchComments()
+        setTimeout(() => {
+            setLoading(false)
+        }, 1000);
+    }, [id, isSubscribed]);
+    useEffect(() => {
+          const fetchVideoLikes = async () => {
             try {
                 const res = await api.get(`/likes/getVideoLikes/${id}`)
                 const likes = res.data.data.likes
@@ -175,20 +189,7 @@ function VideoDetailPage() {
             }
         }
         fetchVideoDislikes()
-        const fetchComments = async () => {
-            try {
-                const comments = await api.get(`/comments/getVideoComments/${id}`)
-                setComments(comments.data.data)
-            } catch (error) {
-                console.log("error in fetching comments", error)
-            }
-        }
-        fetchComments()
-
-        setTimeout(() => {
-            setLoading(false)
-        }, 1000);
-    }, [id, isLiked, isSubscribed]);
+    }, [isLiked,isDisLiked]);
     useEffect(() => {
         const suggestionVideos = async () => {
             try {
