@@ -1,7 +1,7 @@
 import React from 'react'
 import { useState } from 'react';
 import { useEffect } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
 import { api } from '../api/api';
 import { FadeLoader } from 'react-spinners';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -11,7 +11,7 @@ import ChannelVideos from './ChannelVideos';
 import Playlist from './ChannelPlaylist';
 import ChannelPlaylist from './ChannelPlaylist';
 import ChannelSubscribers from './ChannelSubscribers';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { faEdit } from '@fortawesome/free-regular-svg-icons';
 import Modal from '../components/Modal';
 import AddVideo from './AddVideo';
@@ -19,6 +19,7 @@ import Uploading from './Uploading';
 import Uploaded from './Uploaded';
 import EditChannelInfo from './EditChannelInfo';
 import ChangePassword from './ChangePassword';
+import { updateUserData } from '../slices/userSlice';
 
 function Channel() {
   const { username, activeTab } = useParams()
@@ -31,8 +32,8 @@ function Channel() {
   const editTabs = ["Channel information", "Change Password"]
   const [isEditable, setIsEditable] = useState(false);
   const [modalType, setModalType] = useState(null);
-  const navigate = useNavigate()
   const [loading, setLoading] = useState(false);
+  const dispatch = useDispatch()
 
   const handleSubscription = async () => {
     try {
@@ -56,7 +57,6 @@ function Channel() {
 
   const handleAfterUploaded = () => {
     closeModal()
-    navigate(`/channel/${user?.username}/Videos`)
   }
 
   const handleEdit = () => {
@@ -76,8 +76,13 @@ function Channel() {
       setLoading(true)
       const res = await api.patch("/users/updateAvtar", formdata)
       if (res.status === 200) {
+        dispatch(updateUserData({
+          avatar: {
+            url: res.data.data.user.avatar.url,
+            public_id: res.data.data.user.avatar.public_id
+          }
+        }))
         setLoading(false)
-        navigate(`/channel/${user?.username}/Videos`)
       }
 
     } catch (error) {
@@ -92,12 +97,18 @@ function Channel() {
       setLoading(true)
       const res = await api.patch("/users/updateCoverImage", formdata)
       if (res.status === 200) {
+        dispatch(updateUserData({
+          coverImage: {
+            url: res.data.data.user.coverImage.url,
+            public_id: res.data.data.user.coverImage.public_id
+          }
+        }))
         setLoading(false)
-        navigate(`/channel/${user?.username}/Videos`)
+
       }
 
     } catch (error) {
-      console.log("error in update avatar", error)
+      console.log("error in update cover image", error)
     }
   }
 
@@ -112,7 +123,7 @@ function Channel() {
       setIsSubscribed(res.data.data.isSubscribed)
     }
     fetchChannel()
-  }, [username, isSubscribed]);
+  }, [username, isSubscribed, user, channel]);
 
   useEffect(() => {
     console.log("Modal Type:", modalType);
@@ -129,7 +140,7 @@ function Channel() {
     }
     fetchVideos()
 
-  }, [channel]);
+  }, [channel,videos]);
   if (!channel || loading) {
     return (
       <div className='p-4 flex items-center m-auto justify-center h-screen w-full'>

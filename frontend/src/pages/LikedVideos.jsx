@@ -5,45 +5,46 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlayCircle } from '@fortawesome/free-regular-svg-icons';
 import VideoCardView from '../components/VideoCardView';
 function LikedVideos() {
-    const [videos, setVideos] = useState(null);
-    const [loading, setLoading] = useState(true)
+  const [videos, setVideos] = useState(null);
+  const [loading, setLoading] = useState(true)
 
-    useEffect(() => {
-        const getHistory = async () => {
-            try {
-                const res = await api.get("/likes/getLikedVideos");
-                setVideos(res.data.data)
-                setLoading(false)
-            } catch (error) {
-                console.log("eroro in getting history", error)
-            }
-        }
-        getHistory()
-    }, []);
-    
-
-    if (loading) {
-        return (
-            <div className='p-4 flex items-center m-auto justify-center h-screen w-full'>
-                <div className='m-auto items-center'>
-                    <FadeLoader
-                        color="#f3faff"
-                        height={11}
-                        width={9}
-                        radius={3}
-                    />
-                    <p>Loading...</p>
-                </div>
-            </div>
-        )
+  useEffect(() => {
+    const getLikedVideos = async () => {
+      try {
+        const res = await api.get("/likes/getLikedVideos");
+        if(res.status===200){
+          setVideos(res.data.data)
+          setLoading(false)
+        }  
+      } catch (error) {
+        console.log("eroro in getting liked videos", error)
+      }
     }
-   else {
-    return videos?.length === 0 ? (
+    getLikedVideos()
+  }, []);
+
+  if (loading) {
+    return (
+      <div className='p-4 flex items-center m-auto justify-center h-screen w-full'>
+        <div className='m-auto items-center'>
+          <FadeLoader
+            color="#f3faff"
+            height={11}
+            width={9}
+            radius={3}
+          />
+          <p>Loading...</p>
+        </div>
+      </div>
+    )
+  }
+  else {
+    return !videos ? (
       <div className='p-4 flex items-center m-auto justify-center h-screen w-full'>
         <div className='m-auto'>
           <p className='text-3xl text-center m-2 '> <FontAwesomeIcon icon={faPlayCircle} /> </p>
-          <h2 className='text-center text-2xl'>No History Available!!</h2>
-          <p className='text-lg'>There is no History available!!</p>
+          <h2 className='text-center text-2xl'>No Liked videos Available!!</h2>
+          <p className='text-lg'>You haven't liked any videos yet!!</p>
         </div>
       </div>
     )

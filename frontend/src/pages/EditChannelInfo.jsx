@@ -3,7 +3,6 @@ import { useForm } from 'react-hook-form'
 import InputBox from '../components/InputBox'
 import { useDispatch, useSelector } from 'react-redux'
 import { api } from '../api/api'
-import { useNavigate } from 'react-router-dom'
 import { updateUserData } from '../slices/userSlice'
 
 function EditChannelInfo() {
@@ -18,7 +17,6 @@ function EditChannelInfo() {
     const user=useSelector(state=>state.user.userData)
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
-    const navigate=useNavigate()
     const dispatch=useDispatch()
 
     const handleUpdateInfo=async(data)=>{
@@ -36,9 +34,6 @@ function EditChannelInfo() {
                     email:res.data.data.email,
                 }))
                 setSuccess("Details updated successfully")
-                setTimeout(() => {
-                    navigate(`/channel/${user?.username}/Videos`)
-                }, 1000);
              }
  
          }

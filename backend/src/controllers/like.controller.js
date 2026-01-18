@@ -84,7 +84,6 @@ const toggleCommentLike = asyncHandler(async (req, res) => {
 
 const getLikedVideos = asyncHandler(async (req, res) => {
     //get video details
-    // const videos = await Like.find({ likedBy: req.user?._id ,reaction: "like" })
      const videos = await Like.aggregate([
         {
             $match: {

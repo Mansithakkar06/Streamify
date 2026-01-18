@@ -1,8 +1,8 @@
 import { createSlice } from "@reduxjs/toolkit"
 
-const localstoragedata=JSON.parse(localStorage.getItem("user"))
+const localstoragedata = JSON.parse(localStorage.getItem("user"))
 const initialState = {
-    isLoggedin: localstoragedata?true:false,
+    isLoggedin: localstoragedata ? true : false,
     userData: localstoragedata || null
 }
 export const userSlice = createSlice({
@@ -12,31 +12,46 @@ export const userSlice = createSlice({
         signup: (state, action) => {
             state.userData = action.payload
             state.isLoggedin = true
-            localStorage.setItem("user",JSON.stringify(action.payload))
+            localStorage.setItem("user", JSON.stringify(action.payload))
         },
         login: (state, action) => {
             state.userData = action.payload.user
             state.isLoggedin = true
-            localStorage.setItem("user",JSON.stringify(action.payload.user))
+            localStorage.setItem("user", JSON.stringify(action.payload.user))
         },
         logout: (state) => {
             state.userData = null,
-            state.isLoggedin = false
+                state.isLoggedin = false
             localStorage.removeItem("user")
         },
-        updateUserData:(state,action)=>{
-            state.userData={...state.userData,...action.payload}
-            const localuser=JSON.parse(localStorage.getItem("user"))
-            if(localuser){
-                const updateduser={
+        updateUserData: (state, action) => {
+            state.userData = {
+                ...state.userData,
+                ...action.payload,
+                avatar: action.payload.avatar
+                    ? { ...state.userData.avatar, ...action.payload.avatar }
+                    : state.userData.avatar,
+                coverImage: action.payload.coverImage
+                    ? { ...state.userData.coverImage, ...action.payload.coverImage }
+                    : state.userData.coverImage,
+            }
+            const localuser = JSON.parse(localStorage.getItem("user"))
+            if (localuser) {
+                const updateduser = {
                     ...localuser,
-                    ...action.payload
+                    ...action.payload,
+                    avatar: action.payload.avatar
+                        ? { ...localuser.avatar, ...action.payload.avatar }
+                        : localuser.avatar,
+                    coverImage: action.payload.coverImage
+                        ? { ...localuser.coverImage, ...action.payload.coverImage }
+                        : localuser.coverImage,
                 }
-                localStorage.setItem("user",JSON.stringify(updateduser))
+                localStorage.setItem("user", JSON.stringify(updateduser))
             }
         }
     }
 })
 
-export const { signup, login, logout,updateUserData } = userSlice.actions
+export const { signup, login, logout, updateUserData } = userSlice.actions
 export default userSlice.reducer

@@ -416,6 +416,11 @@ const getWatchHistory = asyncHandler(async (req, res) => {
                 //to select userdata from user table 
                 pipeline: [
                     {
+                        $match:{
+                            isPublished:true
+                        }
+                    },
+                    {
                         $lookup: {
                             from: "users",
                             localField: "owner",

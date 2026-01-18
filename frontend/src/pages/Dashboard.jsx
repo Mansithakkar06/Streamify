@@ -8,7 +8,6 @@ import { api } from '../api/api'
 import Switch from 'react-switch'
 import Modal from '../components/Modal'
 import DeleteVideo from './DeleteVideo'
-import { useNavigate } from 'react-router-dom'
 import AddVideo from './AddVideo'
 import Uploading from './Uploading'
 import Uploaded from './Uploaded'
@@ -20,7 +19,6 @@ function Dashboard() {
     const [videos, setVideos] = useState(null);
     const [id, setId] = useState(null);
     const [modalType, setModalType] = useState(null);
-    const navigate = useNavigate()
 
     const handleChange = async (id) => {
         try {
@@ -37,7 +35,6 @@ function Dashboard() {
 
     const handleAfterUploaded = () => {
         closeModal()
-        navigate('/dashboard')
     }
     const handleDelete = (id) => {
         setModalType("delete")
@@ -58,6 +55,8 @@ function Dashboard() {
             }
         }
         fetchdashboardData()
+    }, [dashboardData]);
+    useEffect(() => {
         const fetchVideos = async () => {
             try {
                 const res = await api.get('/dashboard/getChannelVideos')
