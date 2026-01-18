@@ -56,7 +56,7 @@ function Channel() {
 
   const handleAfterUploaded = () => {
     closeModal()
-    navigate(0)
+    navigate(`/channel/${user?.username}/Videos`)
   }
 
   const handleEdit = () => {
@@ -77,7 +77,7 @@ function Channel() {
       const res = await api.patch("/users/updateAvtar", formdata)
       if (res.status === 200) {
         setLoading(false)
-        navigate(0)
+        navigate(`/channel/${user?.username}/Videos`)
       }
 
     } catch (error) {
@@ -93,7 +93,7 @@ function Channel() {
       const res = await api.patch("/users/updateCoverImage", formdata)
       if (res.status === 200) {
         setLoading(false)
-        navigate(0)
+        navigate(`/channel/${user?.username}/Videos`)
       }
 
     } catch (error) {

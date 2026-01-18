@@ -37,7 +37,7 @@ function Dashboard() {
 
     const handleAfterUploaded = () => {
         closeModal()
-        navigate(0)
+        navigate('/dashboard')
     }
     const handleDelete = (id) => {
         setModalType("delete")

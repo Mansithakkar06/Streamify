@@ -37,7 +37,7 @@ function EditChannelInfo() {
                 }))
                 setSuccess("Details updated successfully")
                 setTimeout(() => {
-                    navigate(0)
+                    navigate(`/channel/${user?.username}/Videos`)
                 }, 1000);
              }
  
