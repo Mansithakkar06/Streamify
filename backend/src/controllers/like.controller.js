@@ -37,9 +37,9 @@ const toggleVideoLike = asyncHandler(async (req, res) => {
         likedBy: req.user?._id
     })
     return res
-        .status(200)
+        .status(201)
         .json(
-            new ApiResponse(200, like, "reaction created successfully")
+            new ApiResponse(201, like, "reaction created successfully")
         )
 
 })
@@ -76,9 +76,9 @@ const toggleCommentLike = asyncHandler(async (req, res) => {
         likedBy: req.user?._id
     })
     return res
-        .status(200)
+        .status(201)
         .json(
-            new ApiResponse(200, comment, "reaction created successfully")
+            new ApiResponse(201, comment, "reaction created successfully")
         )
 })
 
@@ -140,8 +140,8 @@ const getLikedVideos = asyncHandler(async (req, res) => {
         },
         
     ])
-    if (!videos.length) {
-        return res.status(200).json(new ApiResponse(200, "No liked videos yet!!"))
+    if (videos.length===0) {
+        return res.status(204).json(new ApiResponse(204,videos, "No liked videos yet!!"))
     }
     res.status(200).json(
         new ApiResponse(200, videos, "Videos liked by you")

@@ -16,12 +16,14 @@ function LikedVideos() {
           setVideos(res.data.data)
           setLoading(false)
         }  
+        setLoading(false)
       } catch (error) {
         console.log("eroro in getting liked videos", error)
       }
     }
     getLikedVideos()
   }, []);
+  
 
   if (loading) {
     return (

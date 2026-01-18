@@ -90,7 +90,7 @@ const registerUser = asyncHandler(async (req, res, next) => {
             .cookie("refreshToken", refreshToken, options)
             .cookie("accessToken", accsessToken, options)
             .json(
-                new ApiResponse(200, createdUser, "User registered successfully")
+                new ApiResponse(201, createdUser, "User registered successfully")
             )
     } catch (error) {
         next(error)
@@ -390,7 +390,7 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
         }
     ])
     if (!channel?.length) {
-        throw new ApiError("404", "channel not found!!")
+        throw new ApiError(404, "channel not found!!")
     }
 
     return res

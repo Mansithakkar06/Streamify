@@ -5,6 +5,7 @@ import { Video } from "../models/video.model.js"
 import { ApiResponse } from "../utils/ApiResponse.js";
 import mongoose from "mongoose";
 import { User } from "../models/user.model.js";
+import { Like } from "../models/like.model.js";
 
 const getAllVideos = asyncHandler(async (req, res) => {
     //get videos by filter,pagination,user,sorting etc..
@@ -254,6 +255,10 @@ const deleteVideo = asyncHandler(async (req, res) => {
     const deletedVideo = await Video.findByIdAndDelete(id)
     if (!deletedVideo) {
         throw new ApiError(500, "error in deleting video!!")
+    }
+    const deleteFromLikedVideos=await Like.findByIdAndDelete(id)
+    if(!deleteFromLikedVideos){
+        throw new ApiError(500, "error in deleting liked video!!")
     }
     return res
         .status(200)

@@ -7,7 +7,6 @@ function DeleteVideo({id,onClose,videos,setVideos}) {
     const handleDelete=async()=>{
         try {
             const res=await api.delete(`/videos/deleteVideo/${id}`)
-            console.log(res.data)
             if(res.status===200){
                 const newVideos=videos.filter((video)=>(
                     video._id!==id

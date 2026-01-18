@@ -64,7 +64,7 @@ function VideoDetailPage() {
                 reactionType = "like"
             }
             const res = await api.post(`/likes/toggleVideoLike/${id}`, { reactionType });
-            if (res.status === 200 && res?.data?.data?.reaction === "like") {
+            if ((res.status === 201 || res.status === 200) && res?.data?.data?.reaction === "like") {
                 setIsLiked(true)
                 setIsDisLiked(false)
             }
@@ -85,7 +85,7 @@ function VideoDetailPage() {
                 reactionType = "dislike"
             }
             const res = await api.post(`/likes/toggleVideoLike/${id}`, { reactionType });
-            if (res.status === 200 && res?.data?.data?.reaction === "dislike") {
+            if ((res.status === 201 || res.status === 200) && res?.data?.data?.reaction === "dislike") {
                 setIsDisLiked(true)
                 setIsLiked(false)
             }
@@ -150,7 +150,7 @@ function VideoDetailPage() {
         }, 1000);
     }, [id, isSubscribed]);
     useEffect(() => {
-          const fetchVideoLikes = async () => {
+        const fetchVideoLikes = async () => {
             try {
                 const res = await api.get(`/likes/getVideoLikes/${id}`)
                 const likes = res.data.data.likes
@@ -189,7 +189,7 @@ function VideoDetailPage() {
             }
         }
         fetchVideoDislikes()
-    }, [isLiked,isDisLiked]);
+    }, [isLiked, isDisLiked]);
     useEffect(() => {
         const suggestionVideos = async () => {
             try {
@@ -207,7 +207,7 @@ function VideoDetailPage() {
         suggestionVideos()
         setTimeout(() => {
             setLoading(false)
-        },1000);
+        }, 1000);
     }, [video]);
     // useEffect(() => {
     //     console.log(video)
