@@ -4,10 +4,14 @@ import React from 'react'
 import VideoCardView from '../components/VideoCardView'
 import { useParams } from 'react-router-dom'
 import { useSelector } from 'react-redux'
+import { useEffect } from 'react'
 
-function ChannelVideos({ videos }) {
+function ChannelVideos({ videos,setVideos }) {
     // const { username } = useParams();
     // const user = useSelector(state => state.user.userData)
+    useEffect(() => {
+        setVideos(videos)
+    }, [videos]);
     return (
         <div>
             {

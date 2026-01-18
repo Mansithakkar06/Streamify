@@ -139,8 +139,8 @@ function Channel() {
       setVideos(res.data.data)
     }
     fetchVideos()
-
   }, [channel,videos]);
+
   if (!channel || loading) {
     return (
       <div className='p-4 flex items-center m-auto justify-center h-screen w-full'>
@@ -281,7 +281,7 @@ function Channel() {
           () => {
             switch (isActive) {
               case "Videos":
-                return <ChannelVideos videos={videos} />
+                return <ChannelVideos videos={videos} setVideos={setVideos} />
               case "Playlist":
                 return <ChannelPlaylist />
               case "Subscribers":
