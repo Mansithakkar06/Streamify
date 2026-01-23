@@ -17,10 +17,10 @@ function Sidebar() {
         <NavLink to={`/channel/${user?.username}/Playlist`} className={({ isActive }) => isActive ? "bg-[#ae7aff] text-black block" : ""}><SidebarItem icon={faFolder} name="Collections" /></NavLink>
         <NavLink to={`/channel/${user?.username}/Subscribers`} className={({ isActive }) => isActive ? "bg-[#ae7aff] text-black block" : ""}><SidebarItem icon={faUserCheck} name="Subscribers" /></NavLink>
       </div>
-      <div className='p-2 space-y-2'>
-        {/* <NavLink to="*" className={({ isActive }) => isActive ? "bg-[#ae7aff] text-black block" : ""}><SidebarItem icon={faCircleQuestion} name="Support" /></NavLink> */}
+      {/* <div className='p-2 space-y-2'>
+        <NavLink to="*" className={({ isActive }) => isActive ? "bg-[#ae7aff] text-black block" : ""}><SidebarItem icon={faCircleQuestion} name="Support" /></NavLink>
         <NavLink to="/settings" className={({ isActive }) => isActive ? "bg-[#ae7aff] text-black block" : ""}><SidebarItem icon={faGear} name="Settings" /></NavLink>
-      </div>
+      </div> */}
     </div>
   )
 }

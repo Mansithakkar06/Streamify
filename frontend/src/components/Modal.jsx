@@ -13,7 +13,7 @@ function Modal({ isOpen, onClose, title="", children }) {
             <h2 className="text-lg font-semibold">{title}</h2>
             <button
               onClick={onClose}
-              className="text-white hover:text-gray-400 text-xl"
+              className="text-white hover:text-gray-400 text-xl hover:cursor-pointer"
             >
               <FontAwesomeIcon icon={faXmark} />
             </button>

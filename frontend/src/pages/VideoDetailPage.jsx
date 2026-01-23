@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { Link, useParams, useNavigate } from 'react-router-dom'
 import { api } from '../api/api';
 import VideoSuggestionView from '../components/VideoSuggestionView';
 import { formatTime } from '../utils/formatTime';
@@ -9,6 +9,9 @@ import { faFolderPlus, faUserPlus, faThumbsUp as solidThumbsUp, faThumbsDown as 
 import CommentView from '../components/CommentView';
 import { FadeLoader } from 'react-spinners';
 import { useSelector } from 'react-redux';
+import Modal from '../components/Modal'
+import CreatePlaylist from './CreatePlaylist'
+import AddToPlayList from './AddToPlayList';
 
 function VideoDetailPage() {
     const { id } = useParams()
@@ -25,6 +28,9 @@ function VideoDetailPage() {
     const [isDisLiked, setIsDisLiked] = useState(false)
     const [subscribers, setSubscribers] = useState(0)
     const [isSubscribed, setIsSubscribed] = useState(false);
+    const navigate = useNavigate()
+    const [modalOpen, setModalOpen] = useState(false);
+    const [modalType, setModalType] = useState(null);
 
     const commentHandler = async (e) => {
         e.preventDefault()
@@ -73,6 +79,7 @@ function VideoDetailPage() {
             }
         } catch (error) {
             console.log("error in like", error)
+            navigate('/login')
         }
     }
     const handleDislike = async () => {
@@ -94,6 +101,7 @@ function VideoDetailPage() {
             }
         } catch (error) {
             console.log("error in dislike", error)
+            navigate('/login')
         }
     }
 
@@ -109,12 +117,23 @@ function VideoDetailPage() {
             }
         } catch (error) {
             console.log("error in subscription", error)
+            navigate('/login')
         }
 
     }
 
-    useEffect(() => {
+    const playListHandler = () => {
+        setModalType("add")
+    }
+    const handleCreatePL=()=>{
+        setModalType("create")
+    }
+    const handleAfterCreate=()=>{
+        setModalType("add")
+    }
+    const closeModal=()=>setModalType(null)
 
+    useEffect(() => {
         const fetchVideo = async () => {
             try {
                 const res = await api.get(`/videos/getVideoById/${id}`)
@@ -257,7 +276,7 @@ function VideoDetailPage() {
                                         <div className='p-3'>
                                             <button className='py-2 px-4 border rounded-l-md hover:cursor-pointer' onClick={handleLike}><FontAwesomeIcon icon={isLiked ? solidThumbsUp : faThumbsUp} /><span>{likes}</span></button>
                                             <button className='py-2 px-4 border rounded-r-md hover:cursor-pointer' onClick={handleDislike}><FontAwesomeIcon icon={isDisLiked ? solidThumbsDown : faThumbsDown} /><span>{disLikes}</span></button>
-                                            <button className='ms-5 border p-2 rounded-md hover:cursor-pointer'><FontAwesomeIcon icon={faFolderPlus} /><span className='px-1'>Save</span></button>
+                                            <button onClick={playListHandler} className='ms-5 border p-2 rounded-md hover:cursor-pointer'><FontAwesomeIcon icon={faFolderPlus} /><span className='px-1'>Save</span></button>
                                         </div>
                                     </div>
                                     <div className='flex justify-between py-2'>
@@ -285,11 +304,16 @@ function VideoDetailPage() {
                                 </div>
                                 <div className='border rounded-md p-3 my-4 w-full'>
                                     <p>{comments.length} {comments.length === 1 ? "Comment" : "Comments"}</p>
-                                    <form onSubmit={commentHandler} className='mb-2'>
-                                        <input type="text" placeholder='Add a Comment' className='border rounded-md px-2 py-1 my-2 w-full text-white' value={content} onChange={(e) => setContent(e.target.value)} />
-                                        <button type='submit'></button>
-                                    </form>
-                                    <hr />
+                                    {
+                                        user &&
+                                        (
+                                            <form onSubmit={commentHandler} className='mb-2'>
+                                                <input type="text" placeholder='Add a Comment' className='border rounded-md px-2 py-1 my-2 w-full text-white' value={content} onChange={(e) => setContent(e.target.value)} />
+                                                <button type='submit'></button>
+                                            </form>
+                                        )
+                                    }
+                                    <hr className="my-1" />
                                     {
                                         comments.map((comment) => (
                                             <div key={comment._id} className='my-1'>
@@ -312,6 +336,11 @@ function VideoDetailPage() {
                         </>
                     )
             }
+            <Modal isOpen={modalType !== null} onClose={closeModal} title={modalType === "add" ? "Add to PlayList" : "Create PlayList"}>
+                {modalType === 'add' && <AddToPlayList onCreate={handleCreatePL} videoid={id}  onclose={closeModal}/>}
+                {modalType === "create" && <CreatePlaylist onclose={handleAfterCreate} />}
+            </Modal>
+           
         </div>
     )
 
