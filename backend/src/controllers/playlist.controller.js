@@ -38,9 +38,11 @@ const getUserPlayLists = asyncHandler(async (req, res) => {
     }
     //get playlist with this user id
     const playlists = await PlayList.find({ owner: userId })
+    .populate("videos")
+    .populate("owner","avatar username")
     //if not there throw error
     if (!playlists.length) {
-        new ApiError(200, "no playlists yet")
+        return res.status(200).json(new ApiResponse(200,[], "no playlists yet"))
     }
     return res
         .status(200)
@@ -96,6 +98,7 @@ const getPlayListById = asyncHandler(async (req, res) => {
                             title:1,
                             thumbnail:1,
                             views:1,
+                            description:1,
                             owner:1,
                             duration:1,
                             createdAt:1
