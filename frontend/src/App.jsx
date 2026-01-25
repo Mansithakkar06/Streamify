@@ -17,12 +17,14 @@ import History from './pages/History'
 import LikedVideos from './pages/LikedVideos'
 import ProtectedRoute from './components/ProtectedRoute'
 import PlaylistVideos from './pages/PlaylistVideos'
+import ScreenGuard from './ScreenGuard'
 
 function App() {
 
   return (
     <>
       <BrowserRouter>
+      <ScreenGuard>
         <Routes>
           <Route path='/login' element={<Login />} />
           <Route path='/signup' element={<Register />} />
@@ -58,6 +60,7 @@ function App() {
           </Route>
 
         </Routes>
+      </ScreenGuard>
       </BrowserRouter>
     </>
   )

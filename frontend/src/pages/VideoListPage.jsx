@@ -22,7 +22,7 @@ function VideoListPage() {
     }, []);
     
     return (
-        <div className='p-4 h-ful'>
+        <div className='p-4 h-full'>
             {
                 videos.map((video) => (
                     <div key={video._id} className='my-4'>
