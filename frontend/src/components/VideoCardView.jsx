@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 
 function VideoCardView({ video }) {
   return (
-    <div className='w-75'>
+    <div className='w-full'>
       <Link to={`/videoDetail/${video?._id}`}>
       <div className='relative'>
         <img src={video?.thumbnail?.url} alt="thumbnail" className="h-48 w-full object-cover shadow-md" />

@@ -208,7 +208,7 @@ function VideoDetailPage() {
             }
         }
         fetchVideoDislikes()
-    }, [isLiked, isDisLiked]);
+    }, [id, user?._id]);
     useEffect(() => {
         const suggestionVideos = async () => {
             try {
@@ -234,7 +234,7 @@ function VideoDetailPage() {
     // }, []);
 
     return (
-        <div className='p-4 flex gap-3'>
+        <div className='p-2 sm:p-4 flex flex-col lg:flex-row gap-4'>
             {
                 loading ? (
                     <div className='p-4 flex items-center m-auto justify-center h-screen w-full'>
@@ -252,7 +252,7 @@ function VideoDetailPage() {
 
                     : (
                         <>
-                            <div className='w-full'>
+                            <div className='w-full min-w-0 flex-1'>
                                 <video
                                     src={url}
                                     autoPlay
@@ -260,71 +260,67 @@ function VideoDetailPage() {
                                     muted
                                     playsInline
                                     controls={true}
-                                    style={{
-                                        width: "100%",
-                                        height: "500px",
-                                        objectFit: "cover",
-                                        background: "#000"
-                                    }}
+                                    className="w-full aspect-video h-auto max-h-[500px] object-contain bg-black rounded-md"
                                 />
-                                <div className='border rounded-md my-4 p-3'>
-                                    <div className='flex justify-between'>
+                                <div className='border border-gray-700 rounded-md my-4 p-3'>
+                                    <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-gray-700 pb-3'>
                                         <div>
-                                            <h2 className='text-lg'>{(video.title)?.replace(/^./, char => char.toUpperCase())}</h2>
-                                            <span>{video.views} Views . </span><span>{formatTime(video.createdAt)}</span>
+                                            <h2 className='text-base sm:text-lg font-semibold'>{(video.title)?.replace(/^./, char => char.toUpperCase())}</h2>
+                                            <span className='text-xs sm:text-sm text-gray-400'>{video.views} Views . </span><span className='text-xs sm:text-sm text-gray-400'>{formatTime(video.createdAt)}</span>
                                         </div>
-                                        <div className='p-3'>
-                                            <button className='py-2 px-4 border rounded-l-md hover:cursor-pointer' onClick={handleLike}><FontAwesomeIcon icon={isLiked ? solidThumbsUp : faThumbsUp} /><span>{likes}</span></button>
-                                            <button className='py-2 px-4 border rounded-r-md hover:cursor-pointer' onClick={handleDislike}><FontAwesomeIcon icon={isDisLiked ? solidThumbsDown : faThumbsDown} /><span>{disLikes}</span></button>
-                                            <button onClick={playListHandler} className='ms-5 border p-2 rounded-md hover:cursor-pointer'><FontAwesomeIcon icon={faFolderPlus} /><span className='px-1'>Save</span></button>
+                                        <div className='flex flex-wrap items-center gap-2'>
+                                            <div className='inline-flex rounded-md shadow-sm'>
+                                                <button className='py-1.5 px-3 border border-gray-600 rounded-l-md hover:bg-gray-700 flex items-center gap-1.5 text-sm' onClick={handleLike}><FontAwesomeIcon icon={isLiked ? solidThumbsUp : faThumbsUp} /><span>{likes}</span></button>
+                                                <button className='py-1.5 px-3 border border-l-0 border-gray-600 rounded-r-md hover:bg-gray-700 flex items-center gap-1.5 text-sm' onClick={handleDislike}><FontAwesomeIcon icon={isDisLiked ? solidThumbsDown : faThumbsDown} /><span>{disLikes}</span></button>
+                                            </div>
+                                            <button onClick={playListHandler} className='border border-gray-600 px-3 py-1.5 rounded-md hover:bg-gray-700 flex items-center gap-1.5 text-sm'><FontAwesomeIcon icon={faFolderPlus} /><span>Save</span></button>
                                         </div>
                                     </div>
-                                    <div className='flex justify-between py-2'>
+                                    <div className='flex flex-wrap justify-between items-center gap-2 py-3'>
                                         <Link to={`/channel/${video.owner?.username}/Videos`}>
-                                            <div className='flex'>
-                                                <img src={video?.owner?.avatar?.url} alt="avatar" className='rounded-full h-12 w-12 object-cover shadow-md mt-1' />
-                                                <div className='p-1 mx-2'>
-                                                    <p className='text-lg'>{(video?.owner?.username)?.replace(/^./, char => char.toUpperCase())}</p>
-                                                    <p className='text-sm text-slate-400'>{subscribers} {subscribers === 1 ? "Subscriber" : "Subscribers"}</p>
+                                            <div className='flex items-center gap-3'>
+                                                <img src={video?.owner?.avatar?.url} alt="avatar" className='rounded-full h-10 w-10 sm:h-12 sm:w-12 object-cover shadow-md' />
+                                                <div>
+                                                    <p className='text-base font-medium'>{(video?.owner?.username)?.replace(/^./, char => char.toUpperCase())}</p>
+                                                    <p className='text-xs text-slate-400'>{subscribers} {subscribers === 1 ? "Subscriber" : "Subscribers"}</p>
                                                 </div>
                                             </div>
                                         </Link>
                                         {video?.owner?.username !== user?.username &&
-                                            <div className='p-4'>
-                                                <button className='w-full md:w-auto flex justify-center items-center gap-2 bg-[#8B5CF6] hover:bg-[#7c3aed] text-black font-semibold px-4 py-2.5 rounded-full transition-colors duration-200 cursor-pointer' onClick={handleSubscription}><FontAwesomeIcon icon={isSubscribed ? faUserXmark : faUserPlus} className='mx-1' /> {isSubscribed ? "Unsubscribe" : "Subscribe"}</button>
+                                            <div>
+                                                <button className='flex justify-center items-center gap-2 bg-[#8B5CF6] hover:bg-[#7c3aed] text-black font-semibold px-4 py-2 text-sm rounded-full transition-colors duration-200 cursor-pointer' onClick={handleSubscription}><FontAwesomeIcon icon={isSubscribed ? faUserXmark : faUserPlus} /> {isSubscribed ? "Unsubscribe" : "Subscribe"}</button>
                                             </div>
                                         }
                                     </div>
-                                    <hr />
+                                    <hr className='border-gray-700' />
                                     <div className='p-1'>
-                                        <p className='text-sm py-2'>
+                                        <p className='text-xs sm:text-sm py-2 text-gray-300'>
                                             {video.description}
                                         </p>
                                     </div>
                                 </div>
-                                <div className='border rounded-md p-3 my-4 w-full'>
-                                    <p>{comments.length} {comments.length === 1 ? "Comment" : "Comments"}</p>
+                                <div className='border border-gray-700 rounded-md p-3 my-4 w-full'>
+                                    <p className='font-medium text-sm sm:text-base mb-2'>{comments.length} {comments.length === 1 ? "Comment" : "Comments"}</p>
                                     {
                                         user &&
                                         (
                                             <form onSubmit={commentHandler} className='mb-2'>
-                                                <input type="text" placeholder='Add a Comment' className='border rounded-md px-2 py-1 my-2 w-full text-white' value={content} onChange={(e) => setContent(e.target.value)} />
+                                                <input type="text" placeholder='Add a Comment' className='border border-gray-600 rounded-md px-3 py-1.5 my-2 w-full text-white bg-transparent text-sm focus:outline-none focus:border-purple-500' value={content} onChange={(e) => setContent(e.target.value)} />
                                                 <button type='submit'></button>
                                             </form>
                                         )
                                     }
-                                    <hr className="my-1" />
+                                    <hr className="my-2 border-gray-700" />
                                     {
                                         comments.map((comment) => (
-                                            <div key={comment._id} className='my-1'>
+                                            <div key={comment._id} className='my-2'>
                                                 <CommentView comment={comment} onDelete={removeComment} onUpdate={updateComment} />
-                                                <hr />
                                             </div>
                                         ))
                                     }
                                 </div>
                             </div>
-                            <div>
+                            <div className='w-full lg:w-80 shrink-0 space-y-3'>
                                 {
                                     suggestions.map((suggestion) => (
                                         <div key={suggestion._id}>

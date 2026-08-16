@@ -34,7 +34,7 @@ function ChannelSubscribers({channel,isSubscribed}) {
       {
         subscribers.map((subscriber)=>(
           <div key={subscriber._id}>
-          <SubscriberView subscriber={subscriber} />
+            <SubscriberView subscriber={subscriber} />
           </div>
         ))
       }

@@ -55,7 +55,7 @@ function Dashboard() {
             }
         }
         fetchdashboardData()
-    }, [dashboardData]);
+    }, []);
     useEffect(() => {
         const fetchVideos = async () => {
             try {
@@ -66,76 +66,91 @@ function Dashboard() {
             }
         }
         fetchVideos()
-    }, [videos]);
+    }, []);
 
     return (
         <div>
-            <Navbar />
-            <div className='p-3 m-3'>
-                <div className='flex justify-between mx-3 mb-5'>
+            <div className='p-2 sm:p-4 m-1 sm:m-3'>
+                <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mx-2 sm:mx-3 mb-5'>
                     <div>
-                        <h3 className='font-bold text-3xl'>Welcome Back, {user?.fullName}</h3>
-                        <p className='text-gray-300 text-sm'>Seamless Video Management, Elevated Results.</p>
+                        <h3 className='font-bold text-xl sm:text-3xl'>Welcome Back, {user?.fullName}</h3>
+                        <p className='text-gray-300 text-xs sm:text-sm'>Seamless Video Management, Elevated Results.</p>
                     </div>
                     <div>
-                        <button className="w-full md:w-auto flex justify-center items-center gap-2 bg-[#8B5CF6] hover:bg-[#7c3aed] text-black font-semibold px-4 py-2.5 rounded-full transition-colors duration-200 cursor-pointer" onClick={handleAddModal}>
+                        <button className="w-full sm:w-auto flex justify-center items-center gap-2 bg-[#8B5CF6] hover:bg-[#7c3aed] text-black font-semibold px-4 py-2 sm:py-2.5 rounded-full transition-colors duration-200 cursor-pointer text-sm" onClick={handleAddModal}>
                             <FontAwesomeIcon icon={faPlus} />
                             <span>Upload Video</span>
                         </button>
                     </div>
                 </div>
-                <div className='grid grid-cols-3 gap-5 mx-3'>
-                    <div className='border p-2'>
-                        <p className='bg-gray-300 rounded-full px-1 py-0.5 m-3 max-w-fit'><FontAwesomeIcon icon={faEye} className='text-[#9e78f8] ' /></p>
-                        <p className='mt-5 mx-3 text-md'>Total Views</p>
-                        <h3 className='text-3xl font-bold mx-3 mb-2'>{dashboardData?.totalViews}</h3>
+                <div className='grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-5 mx-2 sm:mx-3'>
+                    <div className='border border-gray-700 rounded-md p-2 bg-black/20'>
+                        <p className='bg-gray-300 rounded-full px-2 py-1 m-2 max-w-fit'><FontAwesomeIcon icon={faEye} className='text-[#9e78f8]' /></p>
+                        <p className='mt-3 mx-2 text-sm text-gray-300'>Total Views</p>
+                        <h3 className='text-2xl sm:text-3xl font-bold mx-2 mb-2'>{dashboardData?.totalViews || 0}</h3>
                     </div>
-                    <div className='border p-2'>
-                        <p className='bg-gray-300 rounded-full px-1 py-0.5 m-3 max-w-fit'><FontAwesomeIcon icon={faUser} className='text-[#9e78f8] ' /></p>
-                        <p className='mt-5 mx-3 text-md'>Total subscribers</p>
-                        <h3 className='text-3xl font-bold mx-3 mb-2'>{dashboardData?.totalSubscribers}</h3>
+                    <div className='border border-gray-700 rounded-md p-2 bg-black/20'>
+                        <p className='bg-gray-300 rounded-full px-2 py-1 m-2 max-w-fit'><FontAwesomeIcon icon={faUser} className='text-[#9e78f8]' /></p>
+                        <p className='mt-3 mx-2 text-sm text-gray-300'>Total subscribers</p>
+                        <h3 className='text-2xl sm:text-3xl font-bold mx-2 mb-2'>{dashboardData?.totalSubscribers || 0}</h3>
                     </div>
-                    <div className='border p-2'>
-                        <p className='bg-gray-300 rounded-full px-1 py-0.5 m-3 max-w-fit'><FontAwesomeIcon icon={faHeart} className='text-[#9e78f8] ' /></p>
-                        <p className='mt-5 mx-3 text-md'>Total likes</p>
-                        <h3 className='text-3xl font-bold mx-3 mb-2'>{dashboardData?.totalLikes}</h3>
+                    <div className='border border-gray-700 rounded-md p-2 bg-black/20'>
+                        <p className='bg-gray-300 rounded-full px-2 py-1 m-2 max-w-fit'><FontAwesomeIcon icon={faHeart} className='text-[#9e78f8]' /></p>
+                        <p className='mt-3 mx-2 text-sm text-gray-300'>Total likes</p>
+                        <h3 className='text-2xl sm:text-3xl font-bold mx-2 mb-2'>{dashboardData?.totalLikes || 0}</h3>
                     </div>
                 </div>
             </div>
-            <div className="overflow-x-auto border mx-9">
-                <table className="w-full text-sm">
-                    <thead className="border-b border text-lg">
+            <div className="overflow-x-auto border border-gray-700 mx-2 sm:mx-6 my-4 rounded-md bg-black/10">
+                <table className="w-full text-xs sm:text-sm text-left border-collapse min-w-[650px]">
+                    <thead className="border-b border-gray-700 text-xs text-gray-400 uppercase bg-black/40">
                         <tr>
-                            <th className='py-3 px-4'>Status</th>
-                            <th className='py-3 px-4'>Status</th>
-                            <th className='py-3 px-4'>Uploaded</th>
-                            <th className='py-3 px-4'>Rating</th>
-                            <th className='py-3 px-4'>Date uploaded</th>
-                            <th className='py-3 px-4'>Action</th>
+                            <th className='py-3 px-3 sm:px-4 text-center'>Toggle</th>
+                            <th className='py-3 px-3 sm:px-4'>Status</th>
+                            <th className='py-3 px-3 sm:px-4'>Video</th>
+                            <th className='py-3 px-3 sm:px-4 text-center'>Rating</th>
+                            <th className='py-3 px-3 sm:px-4 text-center'>Date Uploaded</th>
+                            <th className='py-3 px-3 sm:px-4 text-center'>Actions</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody className='divide-y divide-gray-800'>
                         {
                             videos?.map((video) => (
-                                <tr key={video?._id} className='border border-b-[#ad8bfb]'>
-                                    <td className='py-3 px-4'>
-                                        <Switch checked={video?.isPublished} onChange={() => handleChange(video._id)} />
+                                <tr key={video?._id} className='hover:bg-slate-900/40 transition-colors'>
+                                    <td className='py-3 px-3 sm:px-4 text-center align-middle'>
+                                        <Switch 
+                                            checked={video?.isPublished} 
+                                            onChange={() => handleChange(video._id)}
+                                            height={20}
+                                            width={40}
+                                        />
                                     </td>
-                                    <td className='py-3 px-4'><p className={`border ${video?.isPublished ? "border-green-500 text-green-500" : "border-orange-500 text-orange-500"}  font-semibold w-fit py-1 px-3 rounded-2xl`}>{video?.isPublished ? "Published" : "Unpublished"}</p></td>
-                                    <td className='py-3 px-4 flex gap-2'>
-                                        <img src={video.thumbnail.url} alt="avatar" className='rounded-full h-10 w-10 object-cover shadow-md' />
-                                        <p className='p-2 font-semibold'>{video?.title}</p></td>
-                                    <td className='py-3 px-4'>
-                                        <div className='flex gap-2 justify-center'>
-                                            <p className='text-green-800 bg-green-100 px-3 py-1 rounded-xl font-semibold'>{video.likesCount} {video.likesCount === 1 ? "like" : "likes"}</p>
-                                            <p className='text-red-800 bg-red-100 px-3 py-1 rounded-xl font-semibold'>{video.dislikesCount} {video.dislikesCount === 1 ? "like" : "likes"}</p>
+                                    <td className='py-3 px-3 sm:px-4 align-middle'>
+                                        <span className={`inline-block border ${video?.isPublished ? "border-green-500/80 text-green-400 bg-green-950/30" : "border-orange-500/80 text-orange-400 bg-orange-950/30"} text-[11px] sm:text-xs font-medium py-0.5 px-2.5 rounded-full`}>
+                                            {video?.isPublished ? "Published" : "Unpublished"}
+                                        </span>
+                                    </td>
+                                    <td className='py-3 px-3 sm:px-4 align-middle'>
+                                        <div className='flex items-center gap-2.5 min-w-0'>
+                                            <img src={video.thumbnail.url} alt="thumbnail" className='rounded-md h-10 w-16 object-cover shadow-sm shrink-0' />
+                                            <p className='font-medium text-white truncate max-w-[120px] sm:max-w-[220px]'>{video?.title}</p>
                                         </div>
                                     </td>
-                                    <td className='py-3 px-4 text-center'>{video?.createdAt.slice(0, 10)}</td>
-                                    <td className='py-3 px-4'>
-                                        <div className='flex gap-3 justify-center'>
-                                            <button className='hover:cursor-pointer' onClick={()=>handleEdit(video._id)}><FontAwesomeIcon icon={faEdit} className='text-lg' /></button>
-                                            <button className='hover:cursor-pointer'><FontAwesomeIcon icon={faTrash} className='text-lg' onClick={() => handleDelete(video._id)} /></button>
+                                    <td className='py-3 px-3 sm:px-4 align-middle text-center'>
+                                        <div className='flex items-center gap-1.5 justify-center text-[11px] sm:text-xs'>
+                                            <span className='text-green-300 bg-green-950/60 border border-green-700/50 px-2 py-0.5 rounded-md font-semibold'>{video.likesCount || 0} {video.likesCount === 1 ? "like" : "likes"}</span>
+                                            <span className='text-red-300 bg-red-950/60 border border-red-700/50 px-2 py-0.5 rounded-md font-semibold'>{video.dislikesCount || 0} {video.dislikesCount === 1 ? "dislike" : "dislikes"}</span>
+                                        </div>
+                                    </td>
+                                    <td className='py-3 px-3 sm:px-4 text-center align-middle text-gray-300 whitespace-nowrap'>{video?.createdAt?.slice(0, 10)}</td>
+                                    <td className='py-3 px-3 sm:px-4 align-middle text-center'>
+                                        <div className='flex gap-2 justify-center items-center'>
+                                            <button className='p-1.5 hover:bg-slate-800 rounded-md text-gray-300 hover:text-purple-400 transition cursor-pointer' title="Edit Video" onClick={() => handleEdit(video._id)}>
+                                                <FontAwesomeIcon icon={faEdit} className='text-sm sm:text-base' />
+                                            </button>
+                                            <button className='p-1.5 hover:bg-slate-800 rounded-md text-gray-300 hover:text-red-400 transition cursor-pointer' title="Delete Video" onClick={() => handleDelete(video._id)}>
+                                                <FontAwesomeIcon icon={faTrash} className='text-sm sm:text-base' />
+                                            </button>
                                         </div>
                                     </td>
                                 </tr>

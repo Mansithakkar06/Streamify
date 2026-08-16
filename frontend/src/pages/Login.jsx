@@ -65,13 +65,18 @@ function Login() {
                         required={true}
                     />
                     <button className='border w-full p-2 my-4 rounded-md hover:cursor-pointer hover:bg-gray-600 hover:text-black'>Login</button>
-                     <div className='flex justify-between'>
+                    <div className='flex justify-between items-center text-sm mb-3'>
                         <div>
-                            <Link to='/'><p className='text-red-400'><FontAwesomeIcon icon={faArrowLeft} />Back</p></Link>
+                            <Link to='/'><p className='text-red-400'><FontAwesomeIcon icon={faArrowLeft} className='mr-1' />Back</p></Link>
                         </div>
                         <div>
-                         <p>Don't have an account?<span className='mx-1 text-blue-500'><Link to='/signup'>signup</Link></span></p>
+                            <Link to='/forgot-password' className='text-purple-400 hover:underline'>
+                                Forgot Password?
+                            </Link>
                         </div>
+                    </div>
+                    <div className='text-center text-sm mt-2'>
+                        <p>Don't have an account?<span className='ml-1 text-blue-500'><Link to='/signup'>signup</Link></span></p>
                     </div>
                     
                 </form>

@@ -10,6 +10,8 @@ import VideoListPage from './pages/VideoListPage'
 import VideoDetailPage from './pages/VideoDetailPage'
 import Login from './pages/Login'
 import Register from './pages/Register'
+import ForgotPassword from './pages/ForgotPassword'
+import ResetPassword from './pages/ResetPassword'
 import Channel from './pages/Channel'
 import Settings from './pages/Settings'
 import Dashboard from './pages/Dashboard'
@@ -28,12 +30,15 @@ function App() {
         <Routes>
           <Route path='/login' element={<Login />} />
           <Route path='/signup' element={<Register />} />
-          <Route path='/dashboard' element={
-            <ProtectedRoute>
-              <Dashboard />
-            </ProtectedRoute>} />
+          <Route path='/forgot-password' element={<ForgotPassword />} />
+          <Route path='/reset-password/:token' element={<ResetPassword />} />
           <Route path='/' element={<Layout />}>
             <Route path='/' element={<Home />} />
+            <Route path='/dashboard' element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>} 
+            />
             <Route path='/search' element={<VideoListPage />} />
             <Route path='/videoDetail/:id' element={<VideoDetailPage />} />
             <Route path='/channel/:username/:activeTab' element={

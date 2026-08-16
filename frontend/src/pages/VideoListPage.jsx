@@ -19,7 +19,7 @@ function VideoListPage() {
             }
         }
         fetchResult()
-    }, []);
+    }, [query]);
     
     return (
         <div className='p-4 h-full'>

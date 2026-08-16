@@ -5,6 +5,7 @@ import { deleteImageFromCloudinary, uploadOnCloudinary } from '../utils/cloudina
 import { ApiResponse } from '../utils/ApiResponse.js'
 import jwt from "jsonwebtoken"
 import mongoose from "mongoose";
+import crypto from "crypto";
 
 const isProduction = process.env.NODE_ENV === "production";
 
@@ -523,6 +524,76 @@ const deleteWatchHistory = asyncHandler(async (req, res) => {
         )
 })
 
+const forgotPasswordRequest = asyncHandler(async (req, res, next) => {
+    try {
+        const { email } = req.body;
+        if (!email || email.trim() === "") {
+            throw new ApiError(400, "Email or Username is required!!");
+        }
+
+        const user = await User.findOne({
+            $or: [{ email: email.toLowerCase() }, { username: email.toLowerCase() }]
+        });
+
+        if (!user) {
+            throw new ApiError(404, "User with this email or username does not exist!!");
+        }
+
+        const resetToken = crypto.randomBytes(32).toString("hex");
+        const hashedToken = crypto.createHash("sha256").update(resetToken).digest("hex");
+
+        user.forgotPasswordToken = hashedToken;
+        user.forgotPasswordTokenExpiry = Date.now() + 15 * 60 * 1000;
+        await user.save({ validateBeforeSave: false });
+
+        return res.status(200).json(
+            new ApiResponse(200, { resetToken }, "Password reset token generated successfully!!")
+        );
+    } catch (error) {
+        next(error);
+    }
+});
+
+const resetPassword = asyncHandler(async (req, res, next) => {
+    try {
+        const { token } = req.params;
+        const { newPassword, confirmPassword } = req.body;
+
+        if (!token) {
+            throw new ApiError(400, "Reset token is required!!");
+        }
+        if (!newPassword || newPassword.trim() === "") {
+            throw new ApiError(400, "New password is required!!");
+        }
+        if (confirmPassword && newPassword !== confirmPassword) {
+            throw new ApiError(400, "Passwords do not match!!");
+        }
+
+        const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
+
+        const user = await User.findOne({
+            forgotPasswordToken: hashedToken,
+            forgotPasswordTokenExpiry: { $gt: Date.now() }
+        });
+
+        if (!user) {
+            throw new ApiError(400, "Invalid or expired reset token!!");
+        }
+
+        user.password = newPassword;
+        user.forgotPasswordToken = undefined;
+        user.forgotPasswordTokenExpiry = undefined;
+
+        await user.save();
+
+        return res.status(200).json(
+            new ApiResponse(200, {}, "Password reset successfully!!")
+        );
+    } catch (error) {
+        next(error);
+    }
+});
+
 export {
     registerUser,
     loginUser,
@@ -536,5 +607,7 @@ export {
     getUserChannelProfile,
     getWatchHistory,
     removeFromWatchHistory,
-    deleteWatchHistory
+    deleteWatchHistory,
+    forgotPasswordRequest,
+    resetPassword
 }

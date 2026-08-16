@@ -6,12 +6,7 @@ import { useParams } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import { useEffect } from 'react'
 
-function ChannelVideos({ videos,setVideos }) {
-    // const { username } = useParams();
-    // const user = useSelector(state => state.user.userData)
-    useEffect(() => {
-        setVideos(videos)
-    }, [videos]);
+function ChannelVideos({ videos, setVideos }) {
     return (
         <div>
             {
@@ -36,9 +31,9 @@ function ChannelVideos({ videos,setVideos }) {
                         </div>
                     ) :
                     (
-                        <div className='p-4 grid grid-cols-4 gap-x-5 gap-y-1'>
+                        <div className='p-3 sm:p-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6'>
                             {videos?.map((video) => (
-                                <div key={video._id} className='mx-2'>
+                                <div key={video._id} className='w-full'>
                                     <VideoCardView video={video} />
                                 </div>
                             ))}

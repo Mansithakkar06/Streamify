@@ -123,13 +123,14 @@ function Channel() {
       setIsSubscribed(res.data.data.isSubscribed)
     }
     fetchChannel()
-  }, [username, isSubscribed, user, channel]);
+  }, [username]);
 
   useEffect(() => {
     console.log("Modal Type:", modalType);
   }, [modalType]);
 
   useEffect(() => {
+    if (!channel?._id) return;
     const fetchVideos = async () => {
       const res = await api.get("/videos/getAllVideos", {
         params: {
@@ -139,7 +140,7 @@ function Channel() {
       setVideos(res.data.data)
     }
     fetchVideos()
-  }, [channel,videos]);
+  }, [channel?._id]);
 
   if (!channel || loading) {
     return (
@@ -219,16 +220,16 @@ function Channel() {
                 {
                   username === user.username ? (
                     !isEditable ?
-                      <div className='flex justify-between gap-3'>
-                        <button className="w-full md:w-auto flex justify-center items-center gap-2 bg-[#8B5CF6] hover:bg-[#7c3aed] text-black font-semibold px-4 py-2.5 rounded-full transition-colors duration-200 cursor-pointer" onClick={handleAddModal}>
+                      <div className='flex flex-wrap sm:flex-nowrap gap-2 sm:gap-3 w-full sm:w-auto mt-2 sm:mt-0'>
+                        <button className="flex-1 sm:flex-initial flex justify-center items-center gap-2 bg-[#8B5CF6] hover:bg-[#7c3aed] text-black text-xs sm:text-sm font-semibold px-3 sm:px-4 py-2 sm:py-2.5 rounded-full transition-colors duration-200 cursor-pointer" onClick={handleAddModal}>
                           <FontAwesomeIcon icon={faPlus} />
                           <span>Add Video</span>
                         </button>
-                        <button className="w-full md:w-auto flex justify-center items-center gap-2 bg-[#8B5CF6] hover:bg-[#7c3aed] text-black font-semibold px-4 py-2.5 rounded-full transition-colors duration-200 cursor-pointer" onClick={handleEdit}>
+                        <button className="flex-1 sm:flex-initial flex justify-center items-center gap-2 bg-[#8B5CF6] hover:bg-[#7c3aed] text-black text-xs sm:text-sm font-semibold px-3 sm:px-4 py-2 sm:py-2.5 rounded-full transition-colors duration-200 cursor-pointer" onClick={handleEdit}>
                           <FontAwesomeIcon icon={faEdit} />
                           <span>Edit</span>
                         </button>
-                        <Link to="/dashboard" className="w-full md:w-auto flex justify-center items-center gap-2 bg-[#8B5CF6] hover:bg-[#7c3aed] text-black font-semibold px-4 py-2.5 rounded-full transition-colors duration-200 cursor-pointer" onClick={handleEdit}>
+                        <Link to="/dashboard" className="flex-1 sm:flex-initial flex justify-center items-center gap-2 bg-[#8B5CF6] hover:bg-[#7c3aed] text-black text-xs sm:text-sm font-semibold px-3 sm:px-4 py-2 sm:py-2.5 rounded-full transition-colors duration-200 cursor-pointer" onClick={handleEdit}>
                           <FontAwesomeIcon icon={faDashboard} />
                           <span>Dashboard</span>
                         </Link>
@@ -253,14 +254,14 @@ function Channel() {
         </div>
       </div>
 
-      <div className='p-3 mx-3 '>
-        <ul className='flex justify-between mb-2 text-center text-gray-400 '>
+      <div className='p-3 mx-1 sm:mx-3 overflow-x-auto'>
+        <ul className='flex justify-between border-b border-gray-700 text-center text-gray-400 min-w-max md:min-w-full'>
           {
             isEditable ?
               editTabs.map((tab) => (
                 <div key={tab}>
                   <button className='cursor-pointer' onClick={() => setIsActive(tab)}>
-                    <li className={`text-center shrink-0 px-32 py-2 ${isActive === tab ? "bg-slate-100 border-b-2" : ""}`}>{tab}</li>
+                    <li className={`text-center shrink-0 px-4 sm:px-8 lg:px-32 py-2 transition ${isActive === tab ? "bg-slate-100 text-black border-b-2 font-semibold" : "hover:text-white"}`}>{tab}</li>
                   </button>
                 </div>
               ))
@@ -268,7 +269,7 @@ function Channel() {
               tabs.map((tab) => (
                 <div key={tab}>
                   <button className='cursor-pointer' onClick={() => setIsActive(tab)}>
-                    <li className={`text-center shrink-0 px-32 py-2 ${isActive === tab ? "bg-slate-100 border-b-2" : ""}`}>{tab}</li>
+                    <li className={`text-center shrink-0 px-4 sm:px-8 lg:px-32 py-2 transition ${isActive === tab ? "bg-slate-100 text-black border-b-2 font-semibold" : "hover:text-white"}`}>{tab}</li>
                   </button>
                 </div>
               ))
